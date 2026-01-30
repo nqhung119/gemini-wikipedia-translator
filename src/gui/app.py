@@ -23,7 +23,12 @@ def run_app():
     root = tk.Tk()
     root.title(t("app_title"))
     root.minsize(800, 600)
-    root.geometry("900x800")
+    w, h = 800, 600
+    root.geometry(f"{w}x{h}")
+    root.update_idletasks()
+    x = (root.winfo_screenwidth() - w) // 2
+    y = (root.winfo_screenheight() - h) // 2
+    root.geometry(f"{w}x{h}+{x}+{y}")
 
     link_entry = None
     fetch_btn = None
@@ -234,7 +239,11 @@ def run_app():
     menubar.add_cascade(label=t("menu_help"), menu=help_menu)
     help_menu.add_command(
         label=t("menu_about"),
-        command=lambda: show_info(root, t("dialog_about"), t("about_text")),
+        command=lambda: show_info(
+            root,
+            t("dialog_about"),
+            t("intro_text") + "\n\n" + t("guide_text"),
+        ),
     )
 
     # --- Vùng cuộn: Canvas + Scrollbar chứa toàn bộ nội dung chính

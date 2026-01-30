@@ -47,20 +47,32 @@ STRINGS = {
         "menu_save_wikitext": "Save Wikitext VI...",
         "menu_exit": "Exit",
         "menu_help": "Help",
-        "menu_about": "About",
+        "menu_about": "Introduction & User guide",
         # Dialogs
         "dialog_error": "Error",
         "dialog_translate_error": "Translation error",
         "dialog_config": "Configuration",
-        "dialog_about": "About",
+        "dialog_about": "Introduction & User guide",
         "config_enter_api_key": "Please enter Gemini API key in the Gemini configuration section.",
         "save_wikitext_vi": "Save target wikitext",
-        # About text
-        "about_text": (
+        # Introduction
+        "intro_text": (
             "Translate Wikipedia\n\n"
-            "Choose source and target languages, fetch any Wikipedia article,\n"
-            "translate via Gemini API, check layout, normalize, and export wikitext.\n\n"
-            "See docs/ke-hoach.md and docs/nghien-cuu.md."
+            "Application to translate Wikipedia articles between languages. "
+            "Choose source and target languages (default: English → Vietnamese), "
+            "paste a Wikipedia article URL, fetch wikitext, translate via Gemini API, "
+            "then check layout, normalize terminology, and export the result."
+        ),
+        # User guide
+        "guide_text": (
+            "User guide:\n\n"
+            "1. From / To: Select source and target languages (e.g. English → Vietnamese).\n\n"
+            "2. URL: Paste a Wikipedia article link (any language, e.g. https://en.wikipedia.org/wiki/...).\n\n"
+            "3. Fetch wikitext: Click to download the article source (wikitext).\n\n"
+            "4. API key: Enter your Gemini API key in the configuration section (saved in config/config.json).\n\n"
+            "5. Translate: Click to translate the source wikitext to the target language.\n\n"
+            "6. Check & Normalize: Check layout (links, templates, refs), compare source/target, normalize terms. Optionally apply normalization to the target box.\n\n"
+            "7. Export: Copy target wikitext to clipboard or save to .wiki / .txt file (File → Save)."
         ),
         # Log messages
         "log_fetched": "[Log] Wikitext fetched.",
@@ -139,20 +151,32 @@ STRINGS = {
         "menu_save_wikitext": "Lưu Wikitext VI...",
         "menu_exit": "Thoát",
         "menu_help": "Help",
-        "menu_about": "Giới thiệu",
+        "menu_about": "Giới thiệu & Hướng dẫn dùng",
         # Dialogs
         "dialog_error": "Lỗi",
         "dialog_translate_error": "Lỗi dịch",
         "dialog_config": "Cấu hình",
-        "dialog_about": "Giới thiệu",
+        "dialog_about": "Giới thiệu & Hướng dẫn dùng",
         "config_enter_api_key": "Vui lòng nhập API key Gemini trong ô Cấu hình Gemini.",
         "save_wikitext_vi": "Lưu wikitext đích",
-        # About text
-        "about_text": (
+        # Giới thiệu
+        "intro_text": (
             "Dịch Wikipedia\n\n"
-            "Chọn ngôn ngữ nguồn và đích, lấy bài Wikipedia bất kỳ,\n"
-            "dịch qua Gemini API, kiểm tra bố cục, chuẩn hóa, xuất wikitext.\n\n"
-            "Xem docs/ke-hoach.md và docs/nghien-cuu.md."
+            "Ứng dụng dịch bài viết Wikipedia giữa các ngôn ngữ. "
+            "Chọn ngôn ngữ nguồn và đích (mặc định: Tiếng Anh → Tiếng Việt), "
+            "dán link bài Wikipedia, lấy wikitext, dịch qua Gemini API, "
+            "sau đó kiểm tra bố cục, chuẩn hóa thuật ngữ và xuất kết quả."
+        ),
+        # Hướng dẫn dùng
+        "guide_text": (
+            "Hướng dẫn dùng:\n\n"
+            "1. Từ / Sang: Chọn ngôn ngữ nguồn và đích (vd. English → Vietnamese).\n\n"
+            "2. URL: Dán link bài viết Wikipedia (bất kỳ ngôn ngữ, vd. https://en.wikipedia.org/wiki/...).\n\n"
+            "3. Lấy wikitext: Bấm để tải mã nguồn bài viết (wikitext).\n\n"
+            "4. API key: Nhập API key Gemini vào ô Cấu hình Gemini (được lưu trong config/config.json).\n\n"
+            "5. Dịch: Bấm để dịch wikitext nguồn sang ngôn ngữ đích.\n\n"
+            "6. Kiểm tra & Chuẩn hóa: Kiểm tra bố cục (link, template, ref), so sánh nguồn/đích, chuẩn hóa thuật ngữ. Có thể bấm Áp dụng chuẩn hóa lên ô đích.\n\n"
+            "7. Xuất: Copy wikitext đích vào clipboard hoặc Lưu ra file .wiki / .txt (File → Lưu Wikitext...)."
         ),
         # Log messages
         "log_fetched": "[Log] Đã lấy wikitext xong.",

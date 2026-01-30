@@ -1,19 +1,43 @@
-"""Các frame GUI: nhập link, log, wikitext EN (Phase 1)."""
+"""Các frame GUI: nhập link, cấu hình, log, wikitext EN/VI (Phase 1–3)."""
 import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext
 
 
-def build_link_frame(parent, on_fetch_click):
-    """Frame nhập link Wikipedia EN và nút Lấy wikitext."""
+def build_link_frame(parent, on_fetch_click, on_translate_click=None):
+    """Frame nhập link Wikipedia EN, nút Lấy wikitext và nút Dịch sang tiếng Việt."""
     frame = ttk.LabelFrame(parent, text="Link Wikipedia tiếng Anh")
     ttk.Label(frame, text="URL:").pack(side=tk.LEFT, padx=(0, 4))
     entry = ttk.Entry(frame, width=70)
     entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 8))
-    btn = ttk.Button(frame, text="Lấy wikitext", command=on_fetch_click)
-    btn.pack(side=tk.RIGHT)
+    btn_fetch = ttk.Button(frame, text="Lấy wikitext", command=on_fetch_click)
+    btn_fetch.pack(side=tk.RIGHT, padx=(0, 4))
+    if on_translate_click:
+        btn_translate = ttk.Button(frame, text="Dịch sang tiếng Việt", command=on_translate_click)
+        btn_translate.pack(side=tk.RIGHT)
+        frame.pack(fill=tk.X, padx=8, pady=6)
+        return frame, entry, btn_fetch, btn_translate
     frame.pack(fill=tk.X, padx=8, pady=6)
-    return frame, entry, btn
+    return frame, entry, btn_fetch
+
+
+def build_config_frame(parent):
+    """Frame cấu hình: API key Gemini, chọn model."""
+    frame = ttk.LabelFrame(parent, text="Cấu hình Gemini")
+    ttk.Label(frame, text="API key:").pack(side=tk.LEFT, padx=(0, 4))
+    api_key_entry = ttk.Entry(frame, width=50, show="*")
+    api_key_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 8))
+    ttk.Label(frame, text="Model:").pack(side=tk.LEFT, padx=(8, 4))
+    model_combo = ttk.Combobox(
+        frame,
+        width=22,
+        values=["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash", "gemini-2.5-flash"],
+        state="readonly",
+    )
+    model_combo.pack(side=tk.LEFT, padx=(0, 8))
+    model_combo.set("gemini-1.5-flash")
+    frame.pack(fill=tk.X, padx=8, pady=6)
+    return frame, api_key_entry, model_combo
 
 
 def build_log_frame(parent):
@@ -26,9 +50,18 @@ def build_log_frame(parent):
 
 
 def build_wikitext_en_frame(parent):
-    """Frame hiển thị wikitext tiếng Anh (read-only)."""
+    """Frame hiển thị wikitext tiếng Anh."""
     frame = ttk.LabelFrame(parent, text="Wikitext EN")
-    text = scrolledtext.ScrolledText(frame, wrap=tk.WORD, state=tk.NORMAL)
+    text = scrolledtext.ScrolledText(frame, wrap=tk.WORD, state=tk.NORMAL, height=12)
+    text.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+    frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
+    return frame, text
+
+
+def build_wikitext_vi_frame(parent):
+    """Frame hiển thị wikitext tiếng Việt (có thể chỉnh tay)."""
+    frame = ttk.LabelFrame(parent, text="Wikitext VI")
+    text = scrolledtext.ScrolledText(frame, wrap=tk.WORD, state=tk.NORMAL, height=12)
     text.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
     frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
     return frame, text

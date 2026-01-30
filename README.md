@@ -8,6 +8,8 @@
 pip install -r requirements.txt
 ```
 
+Lấy API key Gemini (miễn phí) tại [Google AI Studio](https://aistudio.google.com/apikey), sau đó nhập vào ô "API key" trong ứng dụng.
+
 ## Chạy ứng dụng (Phase 1)
 
 Từ thư mục gốc dự án:
@@ -24,12 +26,14 @@ python src/main.py
 
 *(Nếu báo lỗi import, chạy từ thư mục gốc và dùng `python -m src.main`.)*
 
-## Cấu trúc (Phase 1 + 2)
+## Cấu trúc (Phase 1–3)
 
 - `src/main.py` — entry point, khởi chạy GUI
-- `src/gui/app.py` — cửa sổ chính (fetch chạy nền, cập nhật wikitext EN)
-- `src/gui/frames.py` — ô link, nút "Lấy wikitext", ô log, ô wikitext EN
+- `src/gui/app.py` — cửa sổ chính (fetch + dịch chạy nền)
+- `src/gui/frames.py` — ô link, cấu hình (API key, model), nút Lấy wikitext / Dịch, ô log, wikitext EN/VI
 - `src/wikipedia/fetch.py` — parse URL → title, GET MediaWiki REST API → wikitext
+- `src/translate/gemini_client.py` — dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext)
+- `src/config_loader.py` — đọc/ghi `config/config.json` (API key, model)
 - `docs/ke-hoach.md` — kế hoạch triển khai theo phase
 
 ## Tài liệu

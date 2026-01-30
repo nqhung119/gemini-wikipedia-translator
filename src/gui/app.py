@@ -1,4 +1,4 @@
-"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–4)."""
+"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–5)."""
 import tkinter as tk
 from tkinter import ttk
 
@@ -8,6 +8,7 @@ from src.gui.dialogs import show_error
 from src.wikipedia.fetch import fetch_wikitext_from_url
 from src.translate.gemini_client import translate_wikitext
 from src.config_loader import load_config, save_config
+from src.check.layout import check_layout
 
 
 def run_app():
@@ -15,21 +16,23 @@ def run_app():
     root = tk.Tk()
     root.title("Dịch Wikipedia EN → VI")
     root.minsize(800, 600)
-    root.geometry("900x750")
+    root.geometry("900x800")
 
     link_entry = None
     fetch_btn = None
     translate_btn = None
+    check_btn = None
     log_widget = None
     wikitext_en_widget = None
     wikitext_vi_widget = None
+    check_result_widget = None
     api_key_entry = None
     model_combo = None
     status_var = None
     task_running = False
 
     def set_buttons_busy(busy: bool):
-        """Bật/tắt trạng thái bận: disable/enable cả hai nút Lấy wikitext và Dịch (Phase 4)."""
+        """Bật/tắt trạng thái bận: disable/enable Lấy wikitext, Dịch, Kiểm tra (Phase 4–5)."""
         nonlocal task_running
         task_running = busy
         state = tk.DISABLED if busy else tk.NORMAL
@@ -37,6 +40,8 @@ def run_app():
             fetch_btn.configure(state=state)
         if translate_btn:
             translate_btn.configure(state=state)
+        if check_btn:
+            check_btn.configure(state=state)
         if status_var:
             status_var.set("Đang xử lý..." if busy else "Sẵn sàng")
 
@@ -101,11 +106,42 @@ def run_app():
 
         run_background(root, task, on_translate_done)
 
+    def on_check_done(success: bool, data):
+        set_buttons_busy(False)
+        if success and isinstance(data, list):
+            frames.set_check_result(check_result_widget, data)
+            frames.log_append(log_widget, "[Log] Đã chạy kiểm tra bố cục.")
+        else:
+            frames.set_check_result(check_result_widget, [f"Lỗi: {data}"])
+            frames.log_append(log_widget, f"[Log] Lỗi kiểm tra: {data}")
+
+    def do_check():
+        wikitext_vi = wikitext_vi_widget.get("1.0", tk.END).strip()
+        wikitext_en = wikitext_en_widget.get("1.0", tk.END).strip()
+        wikitext = wikitext_vi or wikitext_en
+        if not wikitext:
+            frames.log_append(log_widget, "[Log] Chưa có wikitext (EN hoặc VI). Hãy Lấy wikitext hoặc Dịch trước.")
+            frames.set_check_result(check_result_widget, ["Chưa có wikitext để kiểm tra."])
+            return
+        if task_running:
+            return
+        set_buttons_busy(True)
+        if status_var:
+            status_var.set("Đang kiểm tra bố cục...")
+        frames.log_append(log_widget, "[Log] Đang kiểm tra bố cục...")
+
+        def task():
+            return check_layout(wikitext)
+
+        run_background(root, task, on_check_done)
+
     # --- Thanh trạng thái (Phase 4)
     _, status_var = frames.build_status_bar(root)
 
-    # --- Link + nút Lấy wikitext + Dịch
-    _, link_entry, fetch_btn, translate_btn = frames.build_link_frame(root, do_fetch, do_translate)
+    # --- Link + nút Lấy wikitext + Dịch + Kiểm tra (Phase 5)
+    _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
+        root, do_fetch, do_translate, do_check
+    )
     link_entry.insert(0, "https://en.wikipedia.org/wiki/Front-side_bus")
 
     # --- Cấu hình Gemini
@@ -121,13 +157,17 @@ def run_app():
 
     # --- Log
     _, log_widget = frames.build_log_frame(root)
-    frames.log_append(log_widget, "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch.")
+    frames.log_append(log_widget, "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch / Kiểm tra.")
 
     # --- Wikitext EN
     _, wikitext_en_widget = frames.build_wikitext_en_frame(root)
 
     # --- Wikitext VI
     _, wikitext_vi_widget = frames.build_wikitext_vi_frame(root)
+
+    # --- Kết quả kiểm tra (Phase 5)
+    _, check_result_widget = frames.build_check_result_frame(root)
+    frames.set_check_result(check_result_widget, [])
 
     root.mainloop()
 

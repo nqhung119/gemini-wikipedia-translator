@@ -4,8 +4,8 @@ from tkinter import ttk
 from tkinter import scrolledtext
 
 
-def build_link_frame(parent, on_fetch_click, on_translate_click=None):
-    """Frame nhập link Wikipedia EN, nút Lấy wikitext và nút Dịch sang tiếng Việt."""
+def build_link_frame(parent, on_fetch_click, on_translate_click=None, on_check_click=None):
+    """Frame nhập link Wikipedia EN, nút Lấy wikitext, Dịch, Kiểm tra & Chuẩn hóa (Phase 5)."""
     frame = ttk.LabelFrame(parent, text="Link Wikipedia tiếng Anh")
     ttk.Label(frame, text="URL:").pack(side=tk.LEFT, padx=(0, 4))
     entry = ttk.Entry(frame, width=70)
@@ -14,10 +14,15 @@ def build_link_frame(parent, on_fetch_click, on_translate_click=None):
     btn_fetch.pack(side=tk.RIGHT, padx=(0, 4))
     if on_translate_click:
         btn_translate = ttk.Button(frame, text="Dịch sang tiếng Việt", command=on_translate_click)
-        btn_translate.pack(side=tk.RIGHT)
-        frame.pack(fill=tk.X, padx=8, pady=6)
-        return frame, entry, btn_fetch, btn_translate
+        btn_translate.pack(side=tk.RIGHT, padx=(0, 4))
+    if on_check_click:
+        btn_check = ttk.Button(frame, text="Kiểm tra & Chuẩn hóa", command=on_check_click)
+        btn_check.pack(side=tk.RIGHT)
     frame.pack(fill=tk.X, padx=8, pady=6)
+    if on_translate_click and on_check_click:
+        return frame, entry, btn_fetch, btn_translate, btn_check
+    if on_translate_click:
+        return frame, entry, btn_fetch, btn_translate
     return frame, entry, btn_fetch
 
 
@@ -76,6 +81,24 @@ def build_wikitext_vi_frame(parent):
     text.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
     frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
     return frame, text
+
+
+def build_check_result_frame(parent):
+    """Frame hiển thị kết quả kiểm tra bố cục (Phase 5)."""
+    frame = ttk.LabelFrame(parent, text="Kết quả kiểm tra")
+    text = scrolledtext.ScrolledText(frame, height=6, wrap=tk.WORD, state=tk.DISABLED)
+    text.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+    frame.pack(fill=tk.X, padx=8, pady=6)
+    return frame, text
+
+
+def set_check_result(check_result_widget, lines: list):
+    """Ghi danh sách cảnh báo vào ô Kết quả kiểm tra (gọi từ main thread)."""
+    check_result_widget.configure(state=tk.NORMAL)
+    check_result_widget.delete("1.0", tk.END)
+    text = "\n".join(lines) if lines else "(Chưa chạy kiểm tra.)"
+    check_result_widget.insert(tk.END, text)
+    check_result_widget.configure(state=tk.DISABLED)
 
 
 def log_append(log_widget, message):

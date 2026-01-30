@@ -205,45 +205,7 @@ def run_app():
 
         run_background(root, task, on_check_done)
 
-    # --- Thanh trạng thái (Phase 4)
-    _, status_var = frames.build_status_bar(root)
-
-    # --- Link + nút Lấy wikitext + Dịch + Kiểm tra (Phase 5)
-    _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
-        root, do_fetch, do_translate, do_check
-    )
-    add_tooltip(fetch_btn, "Lấy mã nguồn wikitext từ link Wikipedia tiếng Anh.")
-    add_tooltip(translate_btn, "Dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext).")
-    add_tooltip(check_btn, "Kiểm tra bố cục, so sánh EN/VI, chuẩn hóa thuật ngữ.")
-    link_entry.insert(0, "https://en.wikipedia.org/wiki/Front-side_bus")
-
-    # --- Cấu hình Gemini
-    _, api_key_entry, model_combo = frames.build_config_frame(root)
-    cfg = load_config()
-    if cfg.get("api_key"):
-        api_key_entry.insert(0, cfg["api_key"])
-    if cfg.get("model"):
-        try:
-            model_combo.set(cfg["model"])
-        except tk.TclError:
-            pass
-
-    # --- Log
-    _, log_widget = frames.build_log_frame(root)
-    frames.log_append(log_widget, "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch / Kiểm tra.")
-
-    # --- Wikitext EN
-    _, wikitext_en_widget = frames.build_wikitext_en_frame(root)
-
-    # --- Wikitext VI
-    _, wikitext_vi_widget = frames.build_wikitext_vi_frame(root)
-
-    # --- Xuất Wikitext VI: Copy, Lưu file (Phase 7)
-    _, copy_btn, save_btn = frames.build_export_frame(root, do_copy, do_save)
-    add_tooltip(copy_btn, "Copy toàn bộ nội dung ô Wikitext VI vào clipboard.")
-    add_tooltip(save_btn, "Lưu Wikitext VI ra file .wiki hoặc .txt.")
-
-    # --- Menu (Phase 7)
+    # --- Menu (Phase 7) — đặt trước để luôn ở trên
     menubar = tk.Menu(root)
     root.config(menu=menubar)
     file_menu = tk.Menu(menubar, tearoff=0)
@@ -265,8 +227,77 @@ def run_app():
         ),
     )
 
+    # --- Vùng cuộn: Canvas + Scrollbar chứa toàn bộ nội dung chính
+    container = ttk.Frame(root)
+    container.pack(fill=tk.BOTH, expand=True)
+
+    canvas = tk.Canvas(container, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(container)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.config(command=canvas.yview)
+    canvas.config(yscrollcommand=scrollbar.set)
+
+    content_frame = ttk.Frame(canvas)
+    canvas_window = canvas.create_window(0, 0, window=content_frame, anchor=tk.NW)
+
+    def _on_frame_configure(_event):
+        canvas.configure(scrollregion=canvas.bbox(tk.ALL))
+
+    def _on_canvas_configure(event):
+        canvas.itemconfig(canvas_window, width=event.width)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), tk.UNITS)
+
+    content_frame.bind("<Configure>", _on_frame_configure)
+    canvas.bind("<Configure>", _on_canvas_configure)
+    canvas.bind("<MouseWheel>", _on_mousewheel)
+    content_frame.bind("<MouseWheel>", _on_mousewheel)
+    for child in content_frame.winfo_children():
+        if isinstance(child, ttk.Frame):
+            child.bind("<MouseWheel>", _on_mousewheel)
+
+    # --- Link + nút Lấy wikitext + Dịch + Kiểm tra (Phase 5)
+    _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
+        content_frame, do_fetch, do_translate, do_check
+    )
+    add_tooltip(fetch_btn, "Lấy mã nguồn wikitext từ link Wikipedia tiếng Anh.")
+    add_tooltip(translate_btn, "Dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext).")
+    add_tooltip(check_btn, "Kiểm tra bố cục, so sánh EN/VI, chuẩn hóa thuật ngữ.")
+    link_entry.insert(0, "https://en.wikipedia.org/wiki/Front-side_bus")
+
+    # --- Cấu hình Gemini
+    _, api_key_entry, model_combo = frames.build_config_frame(content_frame)
+    cfg = load_config()
+    if cfg.get("api_key"):
+        api_key_entry.insert(0, cfg["api_key"])
+    if cfg.get("model"):
+        try:
+            model_combo.set(cfg["model"])
+        except tk.TclError:
+            pass
+
+    # --- Log
+    _, log_widget = frames.build_log_frame(content_frame)
+    frames.log_append(log_widget, "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch / Kiểm tra.")
+
+    # --- Wikitext EN
+    _, wikitext_en_widget = frames.build_wikitext_en_frame(content_frame)
+
+    # --- Wikitext VI
+    _, wikitext_vi_widget = frames.build_wikitext_vi_frame(content_frame)
+
+    # --- Xuất Wikitext VI: Copy, Lưu file (Phase 7)
+    _, copy_btn, save_btn = frames.build_export_frame(content_frame, do_copy, do_save)
+    add_tooltip(copy_btn, "Copy toàn bộ nội dung ô Wikitext VI vào clipboard.")
+    add_tooltip(save_btn, "Lưu Wikitext VI ra file .wiki hoặc .txt.")
+
     # --- Kết quả kiểm tra + nút Áp dụng chuẩn hóa (Phase 5–6)
-    _, check_result_widget, apply_normalize_btn = frames.build_check_result_frame(root, do_apply_normalize)
+    _, check_result_widget, apply_normalize_btn = frames.build_check_result_frame(content_frame, do_apply_normalize)
+
+    # --- Thanh trạng thái (Phase 4) — luôn ở dưới cùng
+    _, status_var = frames.build_status_bar(root)
     apply_normalize_btn.configure(state=tk.DISABLED)
     frames.set_check_result(check_result_widget, [])
 

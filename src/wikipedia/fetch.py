@@ -1,5 +1,6 @@
 """
-Lấy wikitext từ bài viết Wikipedia tiếng Anh (MediaWiki REST API).
+Lấy wikitext từ bài viết Wikipedia (MediaWiki REST API).
+Hỗ trợ mọi phiên bản ngôn ngữ (en, vi, fr, ...).
 Tham chiếu: docs/nghien-cuu.md § 3.
 """
 from urllib.parse import urlparse, unquote
@@ -11,26 +12,35 @@ WIKI_REST_URL = "https://en.wikipedia.org/w/rest.php/v1/page"
 
 def parse_url_to_title(url: str) -> str:
     """
-    Từ URL bài viết Wikipedia (en), trích title dùng cho API.
+    Từ URL bài viết Wikipedia, trích title dùng cho API.
     Ví dụ: https://en.wikipedia.org/wiki/Front-side_bus -> Front-side_bus
+    """
+    _, title = parse_url_to_base_and_title(url)
+    return title
+
+
+def parse_url_to_base_and_title(url: str) -> tuple[str, str]:
+    """
+    Từ URL bài viết Wikipedia, trả về (rest_base_url, title).
+    rest_base_url dùng cho REST API (vd: https://en.wikipedia.org/w/rest.php/v1/page).
     """
     url = (url or "").strip()
     if not url:
         raise ValueError("URL trống")
     parsed = urlparse(url)
+    base = f"{parsed.scheme or 'https'}://{parsed.netloc}"
     path = parsed.path.rstrip("/")
     if "/wiki/" not in path:
         raise ValueError("URL không phải dạng Wikipedia /wiki/...")
     title = path.split("/wiki/", 1)[-1]
     if not title:
         raise ValueError("Không tìm thấy title trong URL")
-    # Bỏ fragment (#section) và query (?...) để chỉ lấy title trang
     title = title.split("?")[0].split("#")[0].strip()
     title = unquote(title)
-    # API dùng underscore cho space
     if " " in title:
         title = title.replace(" ", "_")
-    return title
+    rest_base = f"{base.rstrip('/')}/w/rest.php/v1/page"
+    return rest_base, title
 
 
 def fetch_wikitext(
@@ -62,7 +72,7 @@ def fetch_wikitext_from_url(
     user_agent: str = DEFAULT_USER_AGENT,
 ) -> str:
     """
-    Từ URL bài viết Wikipedia tiếng Anh, parse title rồi gọi API lấy wikitext.
+    Từ URL bài viết Wikipedia (bất kỳ ngôn ngữ), parse base + title rồi gọi API lấy wikitext.
     """
-    title = parse_url_to_title(url)
-    return fetch_wikitext(title, user_agent=user_agent)
+    rest_base, title = parse_url_to_base_and_title(url)
+    return fetch_wikitext(title, user_agent=user_agent, base_url=rest_base)

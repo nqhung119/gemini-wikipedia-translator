@@ -2,17 +2,19 @@
 
 STRINGS = {
     "en": {
-        "app_title": "Translate Wikipedia EN → VI",
+        "app_title": "Translate Wikipedia",
         "lang_select_title": "Choose language",
         "lang_select_prompt": "Select interface language:",
         "lang_english": "English",
         "lang_vietnamese": "Tiếng Việt",
         # Link frame
-        "link_frame_title": "English Wikipedia link",
+        "link_frame_title": "Language pair & Wikipedia link",
+        "source_lang_label": "From:",
+        "target_lang_label": "To:",
         "url_label": "URL:",
         "url_placeholder": "https://en.wikipedia.org/wiki/...",
         "btn_fetch": "Fetch wikitext",
-        "btn_translate": "Translate to Vietnamese",
+        "btn_translate": "Translate",
         "btn_check": "Check & Normalize",
         # Config
         "config_frame_title": "Gemini configuration",
@@ -24,20 +26,20 @@ STRINGS = {
         "status_ready": "Ready",
         "status_busy": "Processing...",
         "status_fetching": "Fetching wikitext...",
-        "status_translating": "Translating to Vietnamese...",
+        "status_translating": "Translating...",
         "status_checking": "Checking & normalizing...",
         # Log frame
         "log_frame_title": "Log",
         # Wikitext
-        "wikitext_en_title": "Wikitext EN",
-        "wikitext_vi_title": "Wikitext VI",
+        "wikitext_en_title": "Wikitext (source)",
+        "wikitext_vi_title": "Wikitext (target)",
         # Export
-        "export_frame_title": "Export Wikitext VI",
-        "btn_copy": "Copy wikitext VI",
+        "export_frame_title": "Export Wikitext (target)",
+        "btn_copy": "Copy target wikitext",
         "btn_save": "Save to file...",
         # Check result
         "check_result_title": "Check result",
-        "btn_apply_normalize": "Apply normalization to Wikitext VI",
+        "btn_apply_normalize": "Apply normalization to target wikitext",
         "check_not_run": "(Check not run yet.)",
         "no_wikitext_to_check": "No wikitext to check.",
         # Menu
@@ -52,12 +54,12 @@ STRINGS = {
         "dialog_config": "Configuration",
         "dialog_about": "About",
         "config_enter_api_key": "Please enter Gemini API key in the Gemini configuration section.",
-        "save_wikitext_vi": "Save Wikitext VI",
+        "save_wikitext_vi": "Save target wikitext",
         # About text
         "about_text": (
-            "Translate Wikipedia EN → VI\n\n"
-            "Fetch an English Wikipedia article, translate to Vietnamese via Gemini API,\n"
-            "check layout, normalize terminology, and export wikitext source.\n\n"
+            "Translate Wikipedia\n\n"
+            "Choose source and target languages, fetch any Wikipedia article,\n"
+            "translate via Gemini API, check layout, normalize, and export wikitext.\n\n"
             "See docs/ke-hoach.md and docs/nghien-cuu.md."
         ),
         # Log messages
@@ -67,42 +69,44 @@ STRINGS = {
         "log_fetching": "[Log] Fetching wikitext...",
         "log_translated": "[Log] Translation done.",
         "log_translate_error": "[Log] Translation error: {data}",
-        "log_no_wikitext_en": "[Log] No EN wikitext. Click 'Fetch wikitext' first.",
+        "log_no_wikitext_en": "[Log] No source wikitext. Click 'Fetch wikitext' first.",
         "log_no_api_key": "[Log] No Gemini API key entered.",
-        "log_translating": "[Log] Translating to Vietnamese...",
-        "log_apply_normalize": "[Log] Normalization applied to Wikitext VI.",
-        "log_vi_empty": "[Log] Wikitext VI box is empty.",
-        "log_copied": "[Log] Wikitext VI copied to clipboard.",
+        "log_translating": "[Log] Translating...",
+        "log_apply_normalize": "[Log] Normalization applied to target wikitext.",
+        "log_vi_empty": "[Log] Target wikitext box is empty.",
+        "log_copied": "[Log] Target wikitext copied to clipboard.",
         "log_saved": "[Log] Saved to: {path}",
         "log_save_error": "[Log] Save error: {e}",
         "log_check_done": "[Log] Check (layout + content + normalize) done.",
         "log_check_error": "[Log] Check error: {data}",
-        "log_no_wikitext": "[Log] No wikitext (EN or VI). Fetch or translate first.",
+        "log_no_wikitext": "[Log] No wikitext. Fetch or translate first.",
         "log_checking": "[Log] Checking & normalizing...",
         "log_startup": "[Log] App started. Enter link, API key (if needed), then Fetch / Translate / Check.",
         # Tooltips
-        "tooltip_fetch": "Fetch wikitext source from English Wikipedia link.",
-        "tooltip_translate": "Translate wikitext EN → VI via Gemini API (preserve wikitext syntax).",
-        "tooltip_check": "Check layout, compare EN/VI, normalize terminology.",
-        "tooltip_copy": "Copy entire Wikitext VI content to clipboard.",
-        "tooltip_save": "Save Wikitext VI to .wiki or .txt file.",
+        "tooltip_fetch": "Fetch wikitext from the Wikipedia URL (any language).",
+        "tooltip_translate": "Translate wikitext from source to target language via Gemini API.",
+        "tooltip_check": "Check layout, compare source/target, normalize terminology.",
+        "tooltip_copy": "Copy entire target wikitext to clipboard.",
+        "tooltip_save": "Save target wikitext to .wiki or .txt file.",
         # Check task labels (in do_check)
         "check_section_layout": "--- Layout ---",
-        "check_section_content": "--- Content (EN vs VI) ---",
+        "check_section_content": "--- Content (source vs target) ---",
         "check_section_normalize": "--- Normalize ---",
     },
     "vi": {
-        "app_title": "Dịch Wikipedia EN → VI",
+        "app_title": "Dịch Wikipedia",
         "lang_select_title": "Chọn ngôn ngữ",
         "lang_select_prompt": "Chọn ngôn ngữ giao diện:",
         "lang_english": "English",
         "lang_vietnamese": "Tiếng Việt",
         # Link frame
-        "link_frame_title": "Link Wikipedia tiếng Anh",
+        "link_frame_title": "Cặp ngôn ngữ & link Wikipedia",
+        "source_lang_label": "Từ:",
+        "target_lang_label": "Sang:",
         "url_label": "URL:",
         "url_placeholder": "https://en.wikipedia.org/wiki/...",
         "btn_fetch": "Lấy wikitext",
-        "btn_translate": "Dịch sang tiếng Việt",
+        "btn_translate": "Dịch",
         "btn_check": "Kiểm tra & Chuẩn hóa",
         # Config
         "config_frame_title": "Cấu hình Gemini",
@@ -114,20 +118,20 @@ STRINGS = {
         "status_ready": "Sẵn sàng",
         "status_busy": "Đang xử lý...",
         "status_fetching": "Đang lấy wikitext...",
-        "status_translating": "Đang dịch sang tiếng Việt...",
+        "status_translating": "Đang dịch...",
         "status_checking": "Đang kiểm tra & chuẩn hóa...",
         # Log frame
         "log_frame_title": "Log",
         # Wikitext
-        "wikitext_en_title": "Wikitext EN",
-        "wikitext_vi_title": "Wikitext VI",
+        "wikitext_en_title": "Wikitext (nguồn)",
+        "wikitext_vi_title": "Wikitext (đích)",
         # Export
-        "export_frame_title": "Xuất Wikitext VI",
-        "btn_copy": "Copy wikitext VI",
+        "export_frame_title": "Xuất Wikitext (đích)",
+        "btn_copy": "Copy wikitext đích",
         "btn_save": "Lưu ra file...",
         # Check result
         "check_result_title": "Kết quả kiểm tra",
-        "btn_apply_normalize": "Áp dụng chuẩn hóa lên Wikitext VI",
+        "btn_apply_normalize": "Áp dụng chuẩn hóa lên wikitext đích",
         "check_not_run": "(Chưa chạy kiểm tra.)",
         "no_wikitext_to_check": "Chưa có wikitext để kiểm tra.",
         # Menu
@@ -142,12 +146,12 @@ STRINGS = {
         "dialog_config": "Cấu hình",
         "dialog_about": "Giới thiệu",
         "config_enter_api_key": "Vui lòng nhập API key Gemini trong ô Cấu hình Gemini.",
-        "save_wikitext_vi": "Lưu Wikitext VI",
+        "save_wikitext_vi": "Lưu wikitext đích",
         # About text
         "about_text": (
-            "Dịch Wikipedia EN → VI\n\n"
-            "Lấy bài Wikipedia tiếng Anh, dịch sang tiếng Việt qua Gemini API,\n"
-            "kiểm tra bố cục, chuẩn hóa thuật ngữ, xuất mã nguồn wikitext.\n\n"
+            "Dịch Wikipedia\n\n"
+            "Chọn ngôn ngữ nguồn và đích, lấy bài Wikipedia bất kỳ,\n"
+            "dịch qua Gemini API, kiểm tra bố cục, chuẩn hóa, xuất wikitext.\n\n"
             "Xem docs/ke-hoach.md và docs/nghien-cuu.md."
         ),
         # Log messages
@@ -157,28 +161,28 @@ STRINGS = {
         "log_fetching": "[Log] Đang lấy wikitext...",
         "log_translated": "[Log] Đã dịch xong.",
         "log_translate_error": "[Log] Lỗi dịch: {data}",
-        "log_no_wikitext_en": "[Log] Chưa có wikitext EN. Hãy bấm 'Lấy wikitext' trước.",
+        "log_no_wikitext_en": "[Log] Chưa có wikitext nguồn. Hãy bấm 'Lấy wikitext' trước.",
         "log_no_api_key": "[Log] Chưa nhập API key Gemini.",
-        "log_translating": "[Log] Đang dịch sang tiếng Việt...",
-        "log_apply_normalize": "[Log] Đã áp dụng chuẩn hóa lên Wikitext VI.",
-        "log_vi_empty": "[Log] Ô Wikitext VI trống.",
-        "log_copied": "[Log] Đã copy wikitext VI vào clipboard.",
+        "log_translating": "[Log] Đang dịch...",
+        "log_apply_normalize": "[Log] Đã áp dụng chuẩn hóa lên wikitext đích.",
+        "log_vi_empty": "[Log] Ô wikitext đích trống.",
+        "log_copied": "[Log] Đã copy wikitext đích vào clipboard.",
         "log_saved": "[Log] Đã lưu vào: {path}",
         "log_save_error": "[Log] Lỗi lưu file: {e}",
         "log_check_done": "[Log] Đã chạy kiểm tra (bố cục + nội dung + chuẩn hóa).",
         "log_check_error": "[Log] Lỗi kiểm tra: {data}",
-        "log_no_wikitext": "[Log] Chưa có wikitext (EN hoặc VI). Hãy Lấy wikitext hoặc Dịch trước.",
+        "log_no_wikitext": "[Log] Chưa có wikitext. Hãy Lấy wikitext hoặc Dịch trước.",
         "log_checking": "[Log] Đang kiểm tra & chuẩn hóa...",
         "log_startup": "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch / Kiểm tra.",
         # Tooltips
-        "tooltip_fetch": "Lấy mã nguồn wikitext từ link Wikipedia tiếng Anh.",
-        "tooltip_translate": "Dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext).",
-        "tooltip_check": "Kiểm tra bố cục, so sánh EN/VI, chuẩn hóa thuật ngữ.",
-        "tooltip_copy": "Copy toàn bộ nội dung ô Wikitext VI vào clipboard.",
-        "tooltip_save": "Lưu Wikitext VI ra file .wiki hoặc .txt.",
+        "tooltip_fetch": "Lấy wikitext từ link Wikipedia (mọi ngôn ngữ).",
+        "tooltip_translate": "Dịch wikitext từ ngôn ngữ nguồn sang đích qua Gemini API.",
+        "tooltip_check": "Kiểm tra bố cục, so sánh nguồn/đích, chuẩn hóa thuật ngữ.",
+        "tooltip_copy": "Copy toàn bộ wikitext đích vào clipboard.",
+        "tooltip_save": "Lưu wikitext đích ra file .wiki hoặc .txt.",
         # Check task labels
         "check_section_layout": "--- Bố cục ---",
-        "check_section_content": "--- Nội dung (EN vs VI) ---",
+        "check_section_content": "--- Nội dung (nguồn vs đích) ---",
         "check_section_normalize": "--- Chuẩn hóa ---",
     },
 }

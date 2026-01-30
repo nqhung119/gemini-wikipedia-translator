@@ -5,7 +5,12 @@ import json
 import logging
 from pathlib import Path
 
-CONFIG_DEFAULT = {"api_key": "", "model": "gemini-3-flash-preview"}
+CONFIG_DEFAULT = {
+    "api_key": "",
+    "model": "gemini-3-flash-preview",
+    "source_lang": "en",
+    "target_lang": "vi",
+}
 _log = logging.getLogger(__name__)
 
 
@@ -34,8 +39,13 @@ def load_config():
         return dict(CONFIG_DEFAULT)
 
 
-def save_config(api_key: str = "", model: str = ""):
-    """Ghi api_key và model vào config.json (chỉ ghi field không rỗng).
+def save_config(
+    api_key: str = "",
+    model: str = "",
+    source_lang: str = "",
+    target_lang: str = "",
+):
+    """Ghi api_key, model, source_lang, target_lang vào config.json (chỉ ghi field không rỗng).
     Trả về True nếu ghi thành công, False nếu lỗi."""
     p = _config_path()
     try:
@@ -45,6 +55,10 @@ def save_config(api_key: str = "", model: str = ""):
             current["api_key"] = (api_key or "").strip()
         if model is not None:
             current["model"] = (model or CONFIG_DEFAULT["model"]).strip()
+        if source_lang is not None and (source_lang or "").strip():
+            current["source_lang"] = (source_lang or "").strip().lower()
+        if target_lang is not None and (target_lang or "").strip():
+            current["target_lang"] = (target_lang or "").strip().lower()
         with open(p, "w", encoding="utf-8") as f:
             json.dump(current, f, indent=2, ensure_ascii=False)
         return True

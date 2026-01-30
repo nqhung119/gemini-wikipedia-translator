@@ -1,4 +1,4 @@
-"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–7)."""
+"""Cửa sổ chính tkinter — Dịch Wikipedia (nhiều cặp ngôn ngữ, mặc định EN → VI)."""
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -13,6 +13,7 @@ from src.config_loader import load_config, save_config
 from src.check.layout import check_layout
 from src.check.content import check_content
 from src.check.normalize import normalize
+from src.languages import LANGUAGES, get_lang_code_from_name
 
 
 def run_app():
@@ -35,6 +36,8 @@ def run_app():
     check_result_widget = None
     api_key_entry = None
     model_combo = None
+    source_lang_combo = None
+    target_lang_combo = None
     status_var = None
     task_running = False
     last_normalized_wikitext = None
@@ -111,10 +114,20 @@ def run_app():
         if status_var:
             status_var.set(t("status_translating"))
         frames.log_append(log_widget, t("log_translating"))
-        save_config(api_key=api_key, model=model)
+        source_name = source_lang_combo.get().strip() if source_lang_combo else "English"
+        target_name = target_lang_combo.get().strip() if target_lang_combo else "Vietnamese"
+        source_code = get_lang_code_from_name(source_name) or "en"
+        target_code = get_lang_code_from_name(target_name) or "vi"
+        save_config(api_key=api_key, model=model, source_lang=source_code, target_lang=target_code)
 
         def task():
-            return translate_wikitext_chunked(wikitext_en, api_key=api_key, model=model)
+            return translate_wikitext_chunked(
+                wikitext_en,
+                api_key=api_key,
+                model=model,
+                source_lang=source_name,
+                target_lang=target_name,
+            )
 
         run_background(root, task, on_translate_done)
 
@@ -263,17 +276,28 @@ def run_app():
     _bind_scroll(canvas)
     _bind_scroll(content_frame)
 
-    # --- Link + nút Lấy wikitext + Dịch + Kiểm tra (Phase 5)
-    _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
-        content_frame, do_fetch, do_translate, do_check
+    # --- Link + cặp ngôn ngữ + nút Lấy wikitext, Dịch, Kiểm tra (Phase 5)
+    _, link_entry, fetch_btn, translate_btn, check_btn, source_lang_combo, target_lang_combo = (
+        frames.build_link_frame(content_frame, do_fetch, do_translate, do_check)
     )
     add_tooltip(fetch_btn, t("tooltip_fetch"))
     add_tooltip(translate_btn, t("tooltip_translate"))
     add_tooltip(check_btn, t("tooltip_check"))
 
-    # --- Cấu hình Gemini (URL/API key lần đầu: chữ mờ placeholder; API key load từ config/config.json)
+    # --- Cấu hình Gemini (API key load từ config/config.json)
     _, api_key_entry, model_combo = frames.build_config_frame(content_frame)
     cfg = load_config()
+    # Khôi phục lựa chọn ngôn ngữ nguồn/đích từ config (mặc định en → vi)
+    src_cfg = (cfg.get("source_lang") or "en").strip().lower()
+    tgt_cfg = (cfg.get("target_lang") or "vi").strip().lower()
+    for i, (code, _) in enumerate(LANGUAGES):
+        if code == src_cfg:
+            source_lang_combo.current(i)
+            break
+    for i, (code, _) in enumerate(LANGUAGES):
+        if code == tgt_cfg:
+            target_lang_combo.current(i)
+            break
     if cfg.get("api_key"):
         api_key_entry.delete(0, tk.END)
         api_key_entry.insert(0, cfg["api_key"])

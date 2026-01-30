@@ -1,9 +1,10 @@
-"""Các frame GUI: nhập link, cấu hình, log, wikitext EN/VI (Phase 1–3)."""
+"""Các frame GUI: nhập link, cấu hình, log, wikitext nguồn/đích (Phase 1–3)."""
 import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext
 
 from src.gui.i18n import t
+from src.languages import LANGUAGES, DEFAULT_SOURCE, DEFAULT_TARGET, lang_display_names
 
 
 def _placeholder_focus_in(entry, placeholder, *, is_password=False):
@@ -26,8 +27,23 @@ def _placeholder_focus_out(entry, placeholder, *, is_password=False):
 
 
 def build_link_frame(parent, on_fetch_click, on_translate_click=None, on_check_click=None):
-    """Frame nhập link Wikipedia EN, nút Lấy wikitext, Dịch, Kiểm tra & Chuẩn hóa (Phase 5)."""
+    """Frame chọn cặp ngôn ngữ + link Wikipedia, nút Lấy wikitext, Dịch, Kiểm tra (Phase 5)."""
     frame = ttk.LabelFrame(parent, text=t("link_frame_title"))
+    # Hàng 1: From (nguồn) — To (đích)
+    row_lang = ttk.Frame(frame)
+    row_lang.pack(fill=tk.X, pady=(0, 6))
+    ttk.Label(row_lang, text=t("source_lang_label")).pack(side=tk.LEFT, padx=(0, 4))
+    names = lang_display_names()
+    source_combo = ttk.Combobox(row_lang, values=names, width=14, state="readonly")
+    source_combo.pack(side=tk.LEFT, padx=(0, 8))
+    idx_source = next((i for i, (c, _) in enumerate(LANGUAGES) if c == DEFAULT_SOURCE), 0)
+    source_combo.current(idx_source)
+    ttk.Label(row_lang, text=t("target_lang_label")).pack(side=tk.LEFT, padx=(8, 4))
+    target_combo = ttk.Combobox(row_lang, values=names, width=14, state="readonly")
+    target_combo.pack(side=tk.LEFT, padx=(0, 8))
+    idx_target = next((i for i, (c, _) in enumerate(LANGUAGES) if c == DEFAULT_TARGET), 1)
+    target_combo.current(idx_target)
+    # Hàng 2: URL + nút
     ttk.Label(frame, text=t("url_label")).pack(side=tk.LEFT, padx=(0, 4))
     url_placeholder = t("url_placeholder")
     entry = tk.Entry(frame, width=70, fg="gray")
@@ -35,7 +51,6 @@ def build_link_frame(parent, on_fetch_click, on_translate_click=None, on_check_c
     entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 8))
     entry.bind("<FocusIn>", lambda e: _placeholder_focus_in(entry, url_placeholder))
     entry.bind("<FocusOut>", lambda e: _placeholder_focus_out(entry, url_placeholder))
-    # Thứ tự nút: Lấy wikitext → Dịch → Kiểm tra (pack RIGHT nên pack ngược lại)
     if on_check_click:
         btn_check = ttk.Button(frame, text=t("btn_check"), command=on_check_click)
         btn_check.pack(side=tk.RIGHT)
@@ -46,10 +61,10 @@ def build_link_frame(parent, on_fetch_click, on_translate_click=None, on_check_c
     btn_fetch.pack(side=tk.RIGHT, padx=(0, 4))
     frame.pack(fill=tk.X, padx=8, pady=6)
     if on_translate_click and on_check_click:
-        return frame, entry, btn_fetch, btn_translate, btn_check
+        return frame, entry, btn_fetch, btn_translate, btn_check, source_combo, target_combo
     if on_translate_click:
-        return frame, entry, btn_fetch, btn_translate
-    return frame, entry, btn_fetch
+        return frame, entry, btn_fetch, btn_translate, source_combo, target_combo
+    return frame, entry, btn_fetch, source_combo, target_combo
 
 
 def build_config_frame(parent):

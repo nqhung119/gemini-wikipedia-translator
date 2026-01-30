@@ -35,15 +35,16 @@ def build_config_frame(parent):
     ttk.Label(frame, text="Model:").pack(side=tk.LEFT, padx=(8, 4))
     model_combo = ttk.Combobox(
         frame,
-        width=22,
+        width=26,
         values=[
             "gemini-1.5-flash",
             "gemini-1.5-pro",
             "gemini-2.0-flash",
             "gemini-2.5-flash",
+            "gemini-2.5-flash-lite",
             "gemini-2.5-pro",
-            "gemini-3-flash",
-            "gemini-3-pro",
+            "gemini-3-flash-preview",
+            "gemini-3-pro-preview",
         ],
         state="readonly",
     )

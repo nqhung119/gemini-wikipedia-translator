@@ -83,11 +83,16 @@ def build_wikitext_vi_frame(parent):
     return frame, text
 
 
-def build_check_result_frame(parent):
-    """Frame hiển thị kết quả kiểm tra bố cục (Phase 5)."""
+def build_check_result_frame(parent, on_apply_normalize=None):
+    """Frame hiển thị kết quả kiểm tra (Phase 5–6); nút Áp dụng chuẩn hóa (Phase 6)."""
     frame = ttk.LabelFrame(parent, text="Kết quả kiểm tra")
     text = scrolledtext.ScrolledText(frame, height=6, wrap=tk.WORD, state=tk.DISABLED)
     text.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+    if on_apply_normalize is not None:
+        btn_apply = ttk.Button(frame, text="Áp dụng chuẩn hóa lên Wikitext VI", command=on_apply_normalize)
+        btn_apply.pack(pady=(0, 4))
+        frame.pack(fill=tk.X, padx=8, pady=6)
+        return frame, text, btn_apply
     frame.pack(fill=tk.X, padx=8, pady=6)
     return frame, text
 

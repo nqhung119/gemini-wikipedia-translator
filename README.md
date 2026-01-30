@@ -26,15 +26,17 @@ python src/main.py
 
 *(Nếu báo lỗi import, chạy từ thư mục gốc và dùng `python -m src.main`.)*
 
-## Cấu trúc (Phase 1–5)
+## Cấu trúc (Phase 1–6)
 
 - `src/main.py` — entry point, khởi chạy GUI
 - `src/gui/app.py` — cửa sổ chính (fetch + dịch + kiểm tra chạy nền qua `run_background`)
 - `src/gui/background.py` — **Phase 4:** `run_background(root, task_fn, on_done)` chạy tác vụ nền, callback trên main thread
-- `src/gui/frames.py` — ô link, cấu hình, thanh trạng thái, nút Lấy wikitext / Dịch / **Kiểm tra & Chuẩn hóa**, ô log, wikitext EN/VI, **Kết quả kiểm tra**
+- `src/gui/frames.py` — ô link, cấu hình, thanh trạng thái, nút Lấy wikitext / Dịch / **Kiểm tra & Chuẩn hóa**, ô log, wikitext EN/VI, **Kết quả kiểm tra**, nút **Áp dụng chuẩn hóa**
 - `src/wikipedia/fetch.py` — parse URL → title, GET MediaWiki REST API → wikitext
 - `src/translate/gemini_client.py` — dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext)
 - `src/check/layout.py` — **Phase 5:** kiểm tra bố cục wikitext ([[ ]], {{ }}, \<ref\>, {{reflist}})
+- `src/check/content.py` — **Phase 6:** so sánh EN vs VI (số section, độ dài)
+- `src/check/normalize.py` — **Phase 6:** chuẩn hóa thuật ngữ (glossary EN→VI), gợi ý link nội bộ; file `config/glossary.txt` (tùy chọn)
 - `src/config_loader.py` — đọc/ghi `config/config.json` (API key, model)
 - `docs/ke-hoach.md` — kế hoạch triển khai theo phase
 

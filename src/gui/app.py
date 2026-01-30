@@ -1,4 +1,4 @@
-"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–5)."""
+"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–6)."""
 import tkinter as tk
 from tkinter import ttk
 
@@ -9,6 +9,8 @@ from src.wikipedia.fetch import fetch_wikitext_from_url
 from src.translate.gemini_client import translate_wikitext
 from src.config_loader import load_config, save_config
 from src.check.layout import check_layout
+from src.check.content import check_content
+from src.check.normalize import normalize
 
 
 def run_app():
@@ -22,6 +24,7 @@ def run_app():
     fetch_btn = None
     translate_btn = None
     check_btn = None
+    apply_normalize_btn = None
     log_widget = None
     wikitext_en_widget = None
     wikitext_vi_widget = None
@@ -30,6 +33,7 @@ def run_app():
     model_combo = None
     status_var = None
     task_running = False
+    last_normalized_wikitext = None
 
     def set_buttons_busy(busy: bool):
         """Bật/tắt trạng thái bận: disable/enable Lấy wikitext, Dịch, Kiểm tra (Phase 4–5)."""
@@ -106,12 +110,27 @@ def run_app():
 
         run_background(root, task, on_translate_done)
 
+    def do_apply_normalize():
+        nonlocal last_normalized_wikitext
+        if last_normalized_wikitext is not None:
+            wikitext_vi_widget.delete("1.0", tk.END)
+            wikitext_vi_widget.insert(tk.END, last_normalized_wikitext)
+            frames.log_append(log_widget, "[Log] Đã áp dụng chuẩn hóa lên Wikitext VI.")
+
     def on_check_done(success: bool, data):
+        nonlocal last_normalized_wikitext
         set_buttons_busy(False)
-        if success and isinstance(data, list):
-            frames.set_check_result(check_result_widget, data)
-            frames.log_append(log_widget, "[Log] Đã chạy kiểm tra bố cục.")
+        if success and isinstance(data, dict):
+            lines = data.get("lines", [])
+            last_normalized_wikitext = data.get("normalized_wikitext")
+            frames.set_check_result(check_result_widget, lines)
+            if apply_normalize_btn:
+                apply_normalize_btn.configure(state=tk.NORMAL if last_normalized_wikitext else tk.DISABLED)
+            frames.log_append(log_widget, "[Log] Đã chạy kiểm tra (bố cục + nội dung + chuẩn hóa).")
         else:
+            last_normalized_wikitext = None
+            if apply_normalize_btn:
+                apply_normalize_btn.configure(state=tk.DISABLED)
             frames.set_check_result(check_result_widget, [f"Lỗi: {data}"])
             frames.log_append(log_widget, f"[Log] Lỗi kiểm tra: {data}")
 
@@ -127,11 +146,29 @@ def run_app():
             return
         set_buttons_busy(True)
         if status_var:
-            status_var.set("Đang kiểm tra bố cục...")
-        frames.log_append(log_widget, "[Log] Đang kiểm tra bố cục...")
+            status_var.set("Đang kiểm tra & chuẩn hóa...")
+        frames.log_append(log_widget, "[Log] Đang kiểm tra & chuẩn hóa...")
 
         def task():
-            return check_layout(wikitext)
+            lines = []
+            normalized_wikitext = None
+            # Phase 5: bố cục
+            layout_warnings = check_layout(wikitext_vi or wikitext_en)
+            lines.append("--- Bố cục ---")
+            lines.extend(layout_warnings)
+            # Phase 6: nội dung (EN vs VI)
+            if wikitext_en and wikitext_vi:
+                content_warnings = check_content(wikitext_en, wikitext_vi)
+                lines.append("")
+                lines.append("--- Nội dung (EN vs VI) ---")
+                lines.extend(content_warnings)
+            # Phase 6: chuẩn hóa (thuật ngữ, link)
+            if wikitext_vi:
+                normalized_wikitext, normalize_report = normalize(wikitext_vi)
+                lines.append("")
+                lines.append("--- Chuẩn hóa ---")
+                lines.extend(normalize_report)
+            return {"lines": lines, "normalized_wikitext": normalized_wikitext}
 
         run_background(root, task, on_check_done)
 
@@ -165,8 +202,9 @@ def run_app():
     # --- Wikitext VI
     _, wikitext_vi_widget = frames.build_wikitext_vi_frame(root)
 
-    # --- Kết quả kiểm tra (Phase 5)
-    _, check_result_widget = frames.build_check_result_frame(root)
+    # --- Kết quả kiểm tra + nút Áp dụng chuẩn hóa (Phase 5–6)
+    _, check_result_widget, apply_normalize_btn = frames.build_check_result_frame(root, do_apply_normalize)
+    apply_normalize_btn.configure(state=tk.DISABLED)
     frames.set_check_result(check_result_widget, [])
 
     root.mainloop()

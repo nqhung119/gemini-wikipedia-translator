@@ -47,12 +47,14 @@ STRINGS = {
         "menu_save_wikitext": "Save Wikitext VI...",
         "menu_exit": "Exit",
         "menu_help": "Help",
-        "menu_about": "Introduction & User guide",
+        "menu_intro": "Introduction",
+        "menu_guide": "User guide",
         # Dialogs
         "dialog_error": "Error",
         "dialog_translate_error": "Translation error",
         "dialog_config": "Configuration",
-        "dialog_about": "Introduction & User guide",
+        "dialog_intro": "Introduction",
+        "dialog_guide": "User guide",
         "config_enter_api_key": "Please enter Gemini API key in the Gemini configuration section.",
         "save_wikitext_vi": "Save target wikitext",
         # Introduction
@@ -151,12 +153,14 @@ STRINGS = {
         "menu_save_wikitext": "Lưu Wikitext VI...",
         "menu_exit": "Thoát",
         "menu_help": "Help",
-        "menu_about": "Giới thiệu & Hướng dẫn dùng",
+        "menu_intro": "Giới thiệu",
+        "menu_guide": "Hướng dẫn dùng",
         # Dialogs
         "dialog_error": "Lỗi",
         "dialog_translate_error": "Lỗi dịch",
         "dialog_config": "Cấu hình",
-        "dialog_about": "Giới thiệu & Hướng dẫn dùng",
+        "dialog_intro": "Giới thiệu",
+        "dialog_guide": "Hướng dẫn dùng",
         "config_enter_api_key": "Vui lòng nhập API key Gemini trong ô Cấu hình Gemini.",
         "save_wikitext_vi": "Lưu wikitext đích",
         # Giới thiệu

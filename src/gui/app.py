@@ -238,12 +238,12 @@ def run_app():
     help_menu = tk.Menu(menubar, tearoff=0)
     menubar.add_cascade(label=t("menu_help"), menu=help_menu)
     help_menu.add_command(
-        label=t("menu_about"),
-        command=lambda: show_info(
-            root,
-            t("dialog_about"),
-            t("intro_text") + "\n\n" + t("guide_text"),
-        ),
+        label=t("menu_intro"),
+        command=lambda: show_info(root, t("dialog_intro"), t("intro_text")),
+    )
+    help_menu.add_command(
+        label=t("menu_guide"),
+        command=lambda: show_info(root, t("dialog_guide"), t("guide_text")),
     )
 
     # --- Vùng cuộn: Canvas + Scrollbar chứa toàn bộ nội dung chính

@@ -26,18 +26,19 @@ python src/main.py
 
 *(Nếu báo lỗi import, chạy từ thư mục gốc và dùng `python -m src.main`.)*
 
-## Cấu trúc (Phase 1–7)
+## Cấu trúc (Phase 1–8)
 
 - `src/main.py` — entry point, khởi chạy GUI
-- `src/gui/app.py` — cửa sổ chính (fetch + dịch + kiểm tra chạy nền), **menu File/Help**, **Copy / Lưu file**
+- `src/gui/app.py` — cửa sổ chính (fetch + dịch + kiểm tra chạy nền), menu File/Help, Copy / Lưu file
 - `src/gui/background.py` — **Phase 4:** `run_background(root, task_fn, on_done)` chạy tác vụ nền
-- `src/gui/frames.py` — ô link, cấu hình, thanh trạng thái, nút Lấy wikitext / Dịch / Kiểm tra, ô log, wikitext EN/VI, **frame Xuất** (Copy, Lưu file), Kết quả kiểm tra, Áp dụng chuẩn hóa
-- `src/gui/dialogs.py` — show_error, show_info, **add_tooltip** (Phase 7)
+- `src/gui/frames.py` — ô link, cấu hình (model: **gemini-1.5 / 2.0 / 2.5 / 3**), thanh trạng thái, nút, ô log, wikitext EN/VI, frame Xuất, Kết quả kiểm tra, Áp dụng chuẩn hóa
+- `src/gui/dialogs.py` — show_error, show_info, add_tooltip
 - `src/wikipedia/fetch.py` — parse URL → title, GET MediaWiki REST API → wikitext
-- `src/translate/gemini_client.py` — dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext)
+- `src/translate/gemini_client.py` — dịch wikitext EN → VI (**translate_wikitext_chunked** cho bài dài, Phase 8)
+- `src/translate/chunker.py` — **Phase 8:** tách wikitext theo section (==...==) hoặc max_chars để dịch từng phần
 - `src/check/layout.py` — **Phase 5:** kiểm tra bố cục wikitext
-- `src/check/content.py` — **Phase 6:** so sánh EN vs VI (số section, độ dài)
-- `src/check/normalize.py` — **Phase 6:** chuẩn hóa thuật ngữ (glossary), gợi ý link; `config/glossary.txt` (tùy chọn)
+- `src/check/content.py` — **Phase 6:** so sánh EN vs VI
+- `src/check/normalize.py` — **Phase 6:** chuẩn hóa thuật ngữ, gợi ý link; `config/glossary.txt` (tùy chọn)
 - `src/config_loader.py` — đọc/ghi `config/config.json` (API key, model)
 - `docs/ke-hoach.md` — kế hoạch triển khai theo phase
 

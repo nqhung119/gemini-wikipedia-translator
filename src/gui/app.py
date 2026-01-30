@@ -7,7 +7,7 @@ from src.gui import frames
 from src.gui.background import run_background
 from src.gui.dialogs import show_error, show_info, add_tooltip
 from src.wikipedia.fetch import fetch_wikitext_from_url
-from src.translate.gemini_client import translate_wikitext
+from src.translate.gemini_client import translate_wikitext_chunked
 from src.config_loader import load_config, save_config
 from src.check.layout import check_layout
 from src.check.content import check_content
@@ -107,7 +107,7 @@ def run_app():
         save_config(api_key=api_key, model=model)
 
         def task():
-            return translate_wikitext(wikitext_en, api_key=api_key, model=model)
+            return translate_wikitext_chunked(wikitext_en, api_key=api_key, model=model)
 
         run_background(root, task, on_translate_done)
 

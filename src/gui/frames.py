@@ -83,6 +83,17 @@ def build_wikitext_vi_frame(parent):
     return frame, text
 
 
+def build_export_frame(parent, on_copy_click, on_save_click):
+    """Frame nút xuất: Copy wikitext VI, Lưu ra file (Phase 7)."""
+    frame = ttk.LabelFrame(parent, text="Xuất Wikitext VI")
+    btn_copy = ttk.Button(frame, text="Copy wikitext VI", command=on_copy_click)
+    btn_copy.pack(side=tk.LEFT, padx=(0, 8))
+    btn_save = ttk.Button(frame, text="Lưu ra file...", command=on_save_click)
+    btn_save.pack(side=tk.LEFT)
+    frame.pack(fill=tk.X, padx=8, pady=6)
+    return frame, btn_copy, btn_save
+
+
 def build_check_result_frame(parent, on_apply_normalize=None):
     """Frame hiển thị kết quả kiểm tra (Phase 5–6); nút Áp dụng chuẩn hóa (Phase 6)."""
     frame = ttk.LabelFrame(parent, text="Kết quả kiểm tra")

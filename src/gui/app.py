@@ -1,10 +1,11 @@
-"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–6)."""
+"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–7)."""
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 
 from src.gui import frames
 from src.gui.background import run_background
-from src.gui.dialogs import show_error
+from src.gui.dialogs import show_error, show_info, add_tooltip
 from src.wikipedia.fetch import fetch_wikitext_from_url
 from src.translate.gemini_client import translate_wikitext
 from src.config_loader import load_config, save_config
@@ -117,6 +118,38 @@ def run_app():
             wikitext_vi_widget.insert(tk.END, last_normalized_wikitext)
             frames.log_append(log_widget, "[Log] Đã áp dụng chuẩn hóa lên Wikitext VI.")
 
+    def do_copy():
+        """Copy nội dung Wikitext VI vào clipboard (Phase 7)."""
+        text = wikitext_vi_widget.get("1.0", tk.END)
+        if not text.strip():
+            frames.log_append(log_widget, "[Log] Ô Wikitext VI trống.")
+            return
+        root.clipboard_clear()
+        root.clipboard_append(text)
+        root.update()
+        frames.log_append(log_widget, "[Log] Đã copy wikitext VI vào clipboard.")
+
+    def do_save():
+        """Lưu Wikitext VI ra file .wiki hoặc .txt (Phase 7)."""
+        text = wikitext_vi_widget.get("1.0", tk.END)
+        if not text.strip():
+            frames.log_append(log_widget, "[Log] Ô Wikitext VI trống.")
+            return
+        path = filedialog.asksaveasfilename(
+            defaultextension=".wiki",
+            filetypes=[("Wikitext", "*.wiki"), ("Text", "*.txt"), ("All", "*.*")],
+            title="Lưu Wikitext VI",
+        )
+        if not path:
+            return
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(text)
+            frames.log_append(log_widget, f"[Log] Đã lưu vào: {path}")
+        except Exception as e:
+            frames.log_append(log_widget, f"[Log] Lỗi lưu file: {e}")
+            show_error(root, "Lỗi", str(e))
+
     def on_check_done(success: bool, data):
         nonlocal last_normalized_wikitext
         set_buttons_busy(False)
@@ -179,6 +212,9 @@ def run_app():
     _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
         root, do_fetch, do_translate, do_check
     )
+    add_tooltip(fetch_btn, "Lấy mã nguồn wikitext từ link Wikipedia tiếng Anh.")
+    add_tooltip(translate_btn, "Dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext).")
+    add_tooltip(check_btn, "Kiểm tra bố cục, so sánh EN/VI, chuẩn hóa thuật ngữ.")
     link_entry.insert(0, "https://en.wikipedia.org/wiki/Front-side_bus")
 
     # --- Cấu hình Gemini
@@ -201,6 +237,33 @@ def run_app():
 
     # --- Wikitext VI
     _, wikitext_vi_widget = frames.build_wikitext_vi_frame(root)
+
+    # --- Xuất Wikitext VI: Copy, Lưu file (Phase 7)
+    _, copy_btn, save_btn = frames.build_export_frame(root, do_copy, do_save)
+    add_tooltip(copy_btn, "Copy toàn bộ nội dung ô Wikitext VI vào clipboard.")
+    add_tooltip(save_btn, "Lưu Wikitext VI ra file .wiki hoặc .txt.")
+
+    # --- Menu (Phase 7)
+    menubar = tk.Menu(root)
+    root.config(menu=menubar)
+    file_menu = tk.Menu(menubar, tearoff=0)
+    menubar.add_cascade(label="File", menu=file_menu)
+    file_menu.add_command(label="Lưu Wikitext VI...", command=do_save)
+    file_menu.add_separator()
+    file_menu.add_command(label="Thoát", command=root.quit)
+    help_menu = tk.Menu(menubar, tearoff=0)
+    menubar.add_cascade(label="Help", menu=help_menu)
+    help_menu.add_command(
+        label="Giới thiệu",
+        command=lambda: show_info(
+            root,
+            "Giới thiệu",
+            "Dịch Wikipedia EN → VI\n\n"
+            "Lấy bài Wikipedia tiếng Anh, dịch sang tiếng Việt qua Gemini API,\n"
+            "kiểm tra bố cục, chuẩn hóa thuật ngữ, xuất mã nguồn wikitext.\n\n"
+            "Xem docs/ke-hoach.md và docs/nghien-cuu.md.",
+        ),
+    )
 
     # --- Kết quả kiểm tra + nút Áp dụng chuẩn hóa (Phase 5–6)
     _, check_result_widget, apply_normalize_btn = frames.build_check_result_frame(root, do_apply_normalize)

@@ -26,7 +26,7 @@ STRINGS = {
         "status_ready": "Ready",
         "status_busy": "Processing...",
         "status_fetching": "Fetching wikitext...",
-        "status_translating": "Translating...",
+        "status_translating": "Translating... (may take a few minutes)",
         "status_checking": "Checking & normalizing...",
         # Log frame
         "log_frame_title": "Log",
@@ -52,6 +52,10 @@ STRINGS = {
         # Dialogs
         "dialog_error": "Error",
         "dialog_translate_error": "Translation error",
+        "error_429_hint": (
+            "Hint: Free tier quota is per model. "
+            "Try selecting 'gemini-3-flash-preview' instead of 'gemini-3-pro-preview', or retry in a minute."
+        ),
         "dialog_config": "Configuration",
         "dialog_intro": "Introduction",
         "dialog_guide": "User guide",
@@ -85,7 +89,8 @@ STRINGS = {
         "log_translate_error": "[Log] Translation error: {data}",
         "log_no_wikitext_en": "[Log] No source wikitext. Click 'Fetch wikitext' first.",
         "log_no_api_key": "[Log] No Gemini API key entered.",
-        "log_translating": "[Log] Translating...",
+        "log_translating": "[Log] Sent to Gemini API. Please wait (long articles may take several minutes)...",
+        "log_still_translating": "[Log] Still processing, please wait...",
         "log_apply_normalize": "[Log] Normalization applied to target wikitext.",
         "log_vi_empty": "[Log] Target wikitext box is empty.",
         "log_copied": "[Log] Target wikitext copied to clipboard.",
@@ -132,7 +137,7 @@ STRINGS = {
         "status_ready": "Sẵn sàng",
         "status_busy": "Đang xử lý...",
         "status_fetching": "Đang lấy wikitext...",
-        "status_translating": "Đang dịch...",
+        "status_translating": "Đang dịch... (có thể vài phút)",
         "status_checking": "Đang kiểm tra & chuẩn hóa...",
         # Log frame
         "log_frame_title": "Log",
@@ -158,6 +163,10 @@ STRINGS = {
         # Dialogs
         "dialog_error": "Lỗi",
         "dialog_translate_error": "Lỗi dịch",
+        "error_429_hint": (
+            "Gợi ý: Hạn mức (quota) free tier tính theo từng model. "
+            "Thử chọn model 'gemini-3-flash-preview' thay vì 'gemini-3-pro-preview', hoặc thử lại sau vài chục giây."
+        ),
         "dialog_config": "Cấu hình",
         "dialog_intro": "Giới thiệu",
         "dialog_guide": "Hướng dẫn dùng",
@@ -191,7 +200,8 @@ STRINGS = {
         "log_translate_error": "[Log] Lỗi dịch: {data}",
         "log_no_wikitext_en": "[Log] Chưa có wikitext nguồn. Hãy bấm 'Lấy wikitext' trước.",
         "log_no_api_key": "[Log] Chưa nhập API key Gemini.",
-        "log_translating": "[Log] Đang dịch...",
+        "log_translating": "[Log] Đã gửi lên Gemini API. Vui lòng đợi (bài dài có thể mất vài phút)...",
+        "log_still_translating": "[Log] Vẫn đang xử lý, vui lòng đợi thêm...",
         "log_apply_normalize": "[Log] Đã áp dụng chuẩn hóa lên wikitext đích.",
         "log_vi_empty": "[Log] Ô wikitext đích trống.",
         "log_copied": "[Log] Đã copy wikitext đích vào clipboard.",

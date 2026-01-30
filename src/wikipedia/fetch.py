@@ -28,8 +28,10 @@ def parse_url_to_base_and_title(url: str) -> tuple[str, str]:
     if not url:
         raise ValueError("URL trống")
     parsed = urlparse(url)
+    if not parsed.netloc:
+        raise ValueError("URL thiếu domain (vd. https://en.wikipedia.org/wiki/...)")
     base = f"{parsed.scheme or 'https'}://{parsed.netloc}"
-    path = parsed.path.rstrip("/")
+    path = (parsed.path or "").rstrip("/")
     if "/wiki/" not in path:
         raise ValueError("URL không phải dạng Wikipedia /wiki/...")
     title = path.split("/wiki/", 1)[-1]

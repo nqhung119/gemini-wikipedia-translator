@@ -46,6 +46,7 @@ def run_app():
     status_var = None
     task_running = False
     last_normalized_wikitext = None
+    translate_after_id = None  # id của root.after(30s) nhắc "vẫn đang xử lý"
 
     def set_buttons_busy(busy: bool):
         """Bật/tắt trạng thái bận: disable/enable Lấy wikitext, Dịch, Kiểm tra (Phase 4–5)."""
@@ -91,6 +92,14 @@ def run_app():
         run_background(root, task, on_fetch_done)
 
     def on_translate_done(success: bool, data: str):
+        nonlocal translate_after_id
+        if translate_after_id:
+            root.after_cancel(translate_after_id)
+            translate_after_id = None
+        try:
+            root.config(cursor="")
+        except tk.TclError:
+            pass
         set_buttons_busy(False)
         if success:
             wikitext_vi_widget.delete("1.0", tk.END)
@@ -98,7 +107,10 @@ def run_app():
             frames.log_append(log_widget, t("log_translated"))
         else:
             frames.log_append(log_widget, t("log_translate_error", data=data))
-            show_error(root, t("dialog_translate_error"), data)
+            msg = data
+            if "429" in msg or "quota" in msg.lower():
+                msg = msg + "\n\n" + t("error_429_hint")
+            show_error(root, t("dialog_translate_error"), msg)
 
     def do_translate():
         wikitext_en = wikitext_en_widget.get("1.0", tk.END).strip()
@@ -115,10 +127,19 @@ def run_app():
             return
         if task_running:
             return
+        nonlocal translate_after_id
         set_buttons_busy(True)
         if status_var:
             status_var.set(t("status_translating"))
         frames.log_append(log_widget, t("log_translating"))
+        try:
+            root.config(cursor="wait")
+        except tk.TclError:
+            pass
+        def _on_still_translating():
+            if task_running:
+                frames.log_append(log_widget, t("log_still_translating"))
+        translate_after_id = root.after(30000, _on_still_translating)
         source_name = source_lang_combo.get().strip() if source_lang_combo else "English"
         target_name = target_lang_combo.get().strip() if target_lang_combo else "Vietnamese"
         source_code = get_lang_code_from_name(source_name) or "en"

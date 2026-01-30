@@ -58,7 +58,7 @@ def chunk_wikitext(
 
 
 def _split_by_size(text: str, max_chars: int) -> list[str]:
-    """Cắt text thành các đoạn <= max_chars, ưu tiên cắt tại xuống dòng."""
+    """Cắt text thành các đoạn <= max_chars, ưu tiên cắt tại xuống dòng, rồi tại khoảng trắng."""
     if len(text) <= max_chars:
         return [text]
     chunks: list[str] = []
@@ -66,11 +66,17 @@ def _split_by_size(text: str, max_chars: int) -> list[str]:
     while start < len(text):
         end = min(start + max_chars, len(text))
         if end < len(text):
-            # Tìm vị trí xuống dòng gần end nhất
             chunk = text[start:end]
+            # Ưu tiên 1: cắt tại xuống dòng (trong nửa sau của chunk)
             last_newline = chunk.rfind("\n")
             if last_newline > max_chars // 2:
                 end = start + last_newline + 1
+            else:
+                # Ưu tiên 2: cắt tại khoảng trắng để tránh cắt giữa từ
+                last_space = chunk.rfind(" ")
+                if last_space > max_chars // 2:
+                    end = start + last_space + 1
+                # Nếu không có newline/space trong nửa sau thì cắt cứng tại max_chars
         chunks.append(text[start:end].strip())
         start = end
     return [c for c in chunks if c]

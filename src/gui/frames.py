@@ -164,7 +164,10 @@ def set_check_result(check_result_widget, lines: list):
     """Ghi danh sách cảnh báo vào ô Kết quả kiểm tra (gọi từ main thread)."""
     check_result_widget.configure(state=tk.NORMAL)
     check_result_widget.delete("1.0", tk.END)
-    text = "\n".join(lines) if lines else t("check_not_run")
+    if lines:
+        text = "\n".join(str(line) for line in lines)
+    else:
+        text = t("check_not_run")
     check_result_widget.insert(tk.END, text)
     check_result_widget.configure(state=tk.DISABLED)
 

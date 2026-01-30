@@ -26,9 +26,19 @@ def run_background(
     def worker():
         try:
             result = task_fn()
-            root.after(0, lambda r=result: on_done(True, r))
+
+            def _done_ok(r=result):
+                if root.winfo_exists():
+                    on_done(True, r)
+
+            root.after(0, _done_ok)
         except Exception as e:
             err = str(e)
-            root.after(0, lambda e=err: on_done(False, e))
+
+            def _done_err(e=err):
+                if root.winfo_exists():
+                    on_done(False, e)
+
+            root.after(0, _done_err)
 
     threading.Thread(target=worker, daemon=True).start()

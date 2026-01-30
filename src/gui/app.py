@@ -65,6 +65,8 @@ def run_app():
 
     def do_fetch():
         url = link_entry.get().strip()
+        if url == t("url_placeholder"):
+            url = ""
         if not url:
             frames.log_append(log_widget, t("log_no_url"))
             return
@@ -96,6 +98,8 @@ def run_app():
             frames.log_append(log_widget, t("log_no_wikitext_en"))
             return
         api_key = api_key_entry.get().strip()
+        if api_key == t("api_key_placeholder"):
+            api_key = ""
         model = (model_combo.get() or "gemini-3-flash-preview").strip()
         if not api_key:
             frames.log_append(log_widget, t("log_no_api_key"))
@@ -243,13 +247,21 @@ def run_app():
     def _on_mousewheel(event):
         canvas.yview_scroll(int(-1 * (event.delta / 120)), tk.UNITS)
 
+    def _on_mousewheel_linux_up(_event):
+        canvas.yview_scroll(-3, tk.UNITS)
+
+    def _on_mousewheel_linux_down(_event):
+        canvas.yview_scroll(3, tk.UNITS)
+
+    def _bind_scroll(widget):
+        widget.bind("<MouseWheel>", _on_mousewheel)
+        widget.bind("<Button-4>", _on_mousewheel_linux_up)
+        widget.bind("<Button-5>", _on_mousewheel_linux_down)
+
     content_frame.bind("<Configure>", _on_frame_configure)
     canvas.bind("<Configure>", _on_canvas_configure)
-    canvas.bind("<MouseWheel>", _on_mousewheel)
-    content_frame.bind("<MouseWheel>", _on_mousewheel)
-    for child in content_frame.winfo_children():
-        if isinstance(child, ttk.Frame):
-            child.bind("<MouseWheel>", _on_mousewheel)
+    _bind_scroll(canvas)
+    _bind_scroll(content_frame)
 
     # --- Link + nút Lấy wikitext + Dịch + Kiểm tra (Phase 5)
     _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
@@ -258,13 +270,14 @@ def run_app():
     add_tooltip(fetch_btn, t("tooltip_fetch"))
     add_tooltip(translate_btn, t("tooltip_translate"))
     add_tooltip(check_btn, t("tooltip_check"))
-    link_entry.insert(0, "https://en.wikipedia.org/wiki/Front-side_bus")
 
-    # --- Cấu hình Gemini
+    # --- Cấu hình Gemini (URL/API key lần đầu: chữ mờ placeholder; API key load từ config/config.json)
     _, api_key_entry, model_combo = frames.build_config_frame(content_frame)
     cfg = load_config()
     if cfg.get("api_key"):
+        api_key_entry.delete(0, tk.END)
         api_key_entry.insert(0, cfg["api_key"])
+        api_key_entry.config(fg="black", show="*")
     if cfg.get("model"):
         try:
             model_combo.set(cfg["model"])
@@ -293,6 +306,13 @@ def run_app():
     _, status_var = frames.build_status_bar(root)
     apply_normalize_btn.configure(state=tk.DISABLED)
     frames.set_check_result(check_result_widget, [])
+
+    def _bind_scroll_recursive(widget):
+        _bind_scroll(widget)
+        for child in widget.winfo_children():
+            _bind_scroll_recursive(child)
+
+    _bind_scroll_recursive(content_frame)
 
     root.mainloop()
 

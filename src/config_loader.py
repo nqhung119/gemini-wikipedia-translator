@@ -2,9 +2,11 @@
 Đọc/ghi cấu hình (API key, model) từ config/config.json.
 """
 import json
+import logging
 from pathlib import Path
 
 CONFIG_DEFAULT = {"api_key": "", "model": "gemini-3-flash-preview"}
+_log = logging.getLogger(__name__)
 
 
 def _config_path():
@@ -20,19 +22,32 @@ def load_config():
     try:
         with open(p, "r", encoding="utf-8") as f:
             data = json.load(f)
+        if not isinstance(data, dict):
+            _log.warning("config.json không phải object, dùng mặc định")
+            return dict(CONFIG_DEFAULT)
         return {**CONFIG_DEFAULT, **data}
-    except Exception:
+    except json.JSONDecodeError as e:
+        _log.warning("config.json lỗi JSON: %s", e)
+        return dict(CONFIG_DEFAULT)
+    except OSError as e:
+        _log.warning("Không đọc được config: %s", e)
         return dict(CONFIG_DEFAULT)
 
 
 def save_config(api_key: str = "", model: str = ""):
-    """Ghi api_key và model vào config.json (chỉ ghi field không rỗng)."""
+    """Ghi api_key và model vào config.json (chỉ ghi field không rỗng).
+    Trả về True nếu ghi thành công, False nếu lỗi."""
     p = _config_path()
-    p.parent.mkdir(parents=True, exist_ok=True)
-    current = load_config()
-    if api_key is not None:
-        current["api_key"] = (api_key or "").strip()
-    if model is not None:
-        current["model"] = (model or CONFIG_DEFAULT["model"]).strip()
-    with open(p, "w", encoding="utf-8") as f:
-        json.dump(current, f, indent=2, ensure_ascii=False)
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        current = load_config()
+        if api_key is not None:
+            current["api_key"] = (api_key or "").strip()
+        if model is not None:
+            current["model"] = (model or CONFIG_DEFAULT["model"]).strip()
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(current, f, indent=2, ensure_ascii=False)
+        return True
+    except OSError as e:
+        _log.warning("Không ghi được config: %s", e)
+        return False

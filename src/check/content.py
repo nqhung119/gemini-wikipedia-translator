@@ -9,7 +9,7 @@ def _count_sections(wikitext: str) -> int:
     """Đếm số tiêu đề section (==...== hoặc ===...===)."""
     if not wikitext:
         return 0
-    return len(re.findall(r"^=+\s+.+\s+=+\s*$", wikitext, re.MULTILINE))
+    return len(re.findall(r"^=+\s*.+\s*=+\s*$", wikitext, re.MULTILINE))
 
 
 def check_content(wikitext_en: str, wikitext_vi: str) -> list[str]:

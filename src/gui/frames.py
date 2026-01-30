@@ -6,12 +6,35 @@ from tkinter import scrolledtext
 from src.gui.i18n import t
 
 
+def _placeholder_focus_in(entry, placeholder, *, is_password=False):
+    """Xóa chữ mờ khi focus vào ô (chỉ khi đang hiển thị placeholder)."""
+    if entry.cget("fg") == "gray":
+        entry.delete(0, tk.END)
+        entry.config(fg="black")
+        if is_password:
+            entry.config(show="*")
+
+
+def _placeholder_focus_out(entry, placeholder, *, is_password=False):
+    """Hiện lại chữ mờ khi focus ra và ô trống."""
+    if not entry.get().strip():
+        entry.delete(0, tk.END)
+        entry.insert(0, placeholder)
+        entry.config(fg="gray")
+        if is_password:
+            entry.config(show="")
+
+
 def build_link_frame(parent, on_fetch_click, on_translate_click=None, on_check_click=None):
     """Frame nhập link Wikipedia EN, nút Lấy wikitext, Dịch, Kiểm tra & Chuẩn hóa (Phase 5)."""
     frame = ttk.LabelFrame(parent, text=t("link_frame_title"))
     ttk.Label(frame, text=t("url_label")).pack(side=tk.LEFT, padx=(0, 4))
-    entry = ttk.Entry(frame, width=70)
+    url_placeholder = t("url_placeholder")
+    entry = tk.Entry(frame, width=70, fg="gray")
+    entry.insert(0, url_placeholder)
     entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 8))
+    entry.bind("<FocusIn>", lambda e: _placeholder_focus_in(entry, url_placeholder))
+    entry.bind("<FocusOut>", lambda e: _placeholder_focus_out(entry, url_placeholder))
     # Thứ tự nút: Lấy wikitext → Dịch → Kiểm tra (pack RIGHT nên pack ngược lại)
     if on_check_click:
         btn_check = ttk.Button(frame, text=t("btn_check"), command=on_check_click)
@@ -33,8 +56,16 @@ def build_config_frame(parent):
     """Frame cấu hình: API key Gemini, chọn model."""
     frame = ttk.LabelFrame(parent, text=t("config_frame_title"))
     ttk.Label(frame, text=t("api_key_label")).pack(side=tk.LEFT, padx=(0, 4))
-    api_key_entry = ttk.Entry(frame, width=50, show="*")
+    api_key_placeholder = t("api_key_placeholder")
+    api_key_entry = tk.Entry(frame, width=50, fg="gray", show="")
+    api_key_entry.insert(0, api_key_placeholder)
     api_key_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 8))
+    api_key_entry.bind(
+        "<FocusIn>", lambda e: _placeholder_focus_in(api_key_entry, api_key_placeholder, is_password=True)
+    )
+    api_key_entry.bind(
+        "<FocusOut>", lambda e: _placeholder_focus_out(api_key_entry, api_key_placeholder, is_password=True)
+    )
     ttk.Label(frame, text=t("model_label")).pack(side=tk.LEFT, padx=(8, 4))
     model_combo = ttk.Combobox(
         frame,

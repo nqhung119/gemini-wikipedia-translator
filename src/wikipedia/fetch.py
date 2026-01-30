@@ -24,6 +24,8 @@ def parse_url_to_title(url: str) -> str:
     title = path.split("/wiki/", 1)[-1]
     if not title:
         raise ValueError("Không tìm thấy title trong URL")
+    # Bỏ fragment (#section) và query (?...) để chỉ lấy title trang
+    title = title.split("?")[0].split("#")[0].strip()
     title = unquote(title)
     # API dùng underscore cho space
     if " " in title:

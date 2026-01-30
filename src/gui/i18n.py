@@ -10,12 +10,14 @@ STRINGS = {
         # Link frame
         "link_frame_title": "English Wikipedia link",
         "url_label": "URL:",
+        "url_placeholder": "https://en.wikipedia.org/wiki/...",
         "btn_fetch": "Fetch wikitext",
         "btn_translate": "Translate to Vietnamese",
         "btn_check": "Check & Normalize",
         # Config
         "config_frame_title": "Gemini configuration",
         "api_key_label": "API key:",
+        "api_key_placeholder": "Enter Gemini API key...",
         "model_label": "Model:",
         # Status
         "status_label": "Status:",
@@ -98,12 +100,14 @@ STRINGS = {
         # Link frame
         "link_frame_title": "Link Wikipedia tiếng Anh",
         "url_label": "URL:",
+        "url_placeholder": "https://en.wikipedia.org/wiki/...",
         "btn_fetch": "Lấy wikitext",
         "btn_translate": "Dịch sang tiếng Việt",
         "btn_check": "Kiểm tra & Chuẩn hóa",
         # Config
         "config_frame_title": "Cấu hình Gemini",
         "api_key_label": "API key:",
+        "api_key_placeholder": "Nhập API key Gemini...",
         "model_label": "Model:",
         # Status
         "status_label": "Trạng thái:",

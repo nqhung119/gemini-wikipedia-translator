@@ -40,9 +40,20 @@ def build_config_frame(parent):
     return frame, api_key_entry, model_combo
 
 
+def build_status_bar(parent):
+    """Thanh trạng thái: Sẵn sàng / Đang xử lý... (Phase 4)."""
+    frame = ttk.Frame(parent)
+    ttk.Label(frame, text="Trạng thái:").pack(side=tk.LEFT, padx=(0, 4))
+    status_var = tk.StringVar(value="Sẵn sàng")
+    status_label = ttk.Label(frame, textvariable=status_var)
+    status_label.pack(side=tk.LEFT)
+    frame.pack(fill=tk.X, padx=8, pady=2)
+    return frame, status_var
+
+
 def build_log_frame(parent):
     """Frame hiển thị log / trạng thái."""
-    frame = ttk.LabelFrame(parent, text="Trạng thái")
+    frame = ttk.LabelFrame(parent, text="Log")
     log = scrolledtext.ScrolledText(frame, height=4, wrap=tk.WORD, state=tk.DISABLED)
     log.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
     frame.pack(fill=tk.X, padx=8, pady=6)

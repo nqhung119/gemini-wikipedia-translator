@@ -1,9 +1,9 @@
-"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–3)."""
+"""Cửa sổ chính tkinter — Dịch Wikipedia EN → VI (Phase 1–4)."""
 import tkinter as tk
 from tkinter import ttk
-import threading
 
 from src.gui import frames
+from src.gui.background import run_background
 from src.gui.dialogs import show_error
 from src.wikipedia.fetch import fetch_wikitext_from_url
 from src.translate.gemini_client import translate_wikitext
@@ -25,14 +25,23 @@ def run_app():
     wikitext_vi_widget = None
     api_key_entry = None
     model_combo = None
-    fetch_running = False
-    translate_running = False
+    status_var = None
+    task_running = False
+
+    def set_buttons_busy(busy: bool):
+        """Bật/tắt trạng thái bận: disable/enable cả hai nút Lấy wikitext và Dịch (Phase 4)."""
+        nonlocal task_running
+        task_running = busy
+        state = tk.DISABLED if busy else tk.NORMAL
+        if fetch_btn:
+            fetch_btn.configure(state=state)
+        if translate_btn:
+            translate_btn.configure(state=state)
+        if status_var:
+            status_var.set("Đang xử lý..." if busy else "Sẵn sàng")
 
     def on_fetch_done(success: bool, data: str):
-        nonlocal fetch_running
-        fetch_running = False
-        if fetch_btn:
-            fetch_btn.configure(state=tk.NORMAL)
+        set_buttons_busy(False)
         if success:
             wikitext_en_widget.delete("1.0", tk.END)
             wikitext_en_widget.insert(tk.END, data)
@@ -46,27 +55,20 @@ def run_app():
         if not url:
             frames.log_append(log_widget, "[Log] Chưa nhập URL.")
             return
-        if fetch_running:
+        if task_running:
             return
-        fetch_running = True
-        fetch_btn.configure(state=tk.DISABLED)
+        set_buttons_busy(True)
+        if status_var:
+            status_var.set("Đang lấy wikitext...")
         frames.log_append(log_widget, "[Log] Đang lấy wikitext...")
 
-        def worker():
-            try:
-                wikitext = fetch_wikitext_from_url(url)
-                root.after(0, lambda w=wikitext: on_fetch_done(True, w))
-            except Exception as e:
-                err = str(e)
-                root.after(0, lambda e=err: on_fetch_done(False, e))
+        def task():
+            return fetch_wikitext_from_url(url)
 
-        threading.Thread(target=worker, daemon=True).start()
+        run_background(root, task, on_fetch_done)
 
     def on_translate_done(success: bool, data: str):
-        nonlocal translate_running
-        translate_running = False
-        if translate_btn:
-            translate_btn.configure(state=tk.NORMAL)
+        set_buttons_busy(False)
         if success:
             wikitext_vi_widget.delete("1.0", tk.END)
             wikitext_vi_widget.insert(tk.END, data)
@@ -86,22 +88,21 @@ def run_app():
             frames.log_append(log_widget, "[Log] Chưa nhập API key Gemini.")
             show_error(root, "Cấu hình", "Vui lòng nhập API key Gemini trong ô Cấu hình Gemini.")
             return
-        if translate_running:
+        if task_running:
             return
-        translate_running = True
-        translate_btn.configure(state=tk.DISABLED)
+        set_buttons_busy(True)
+        if status_var:
+            status_var.set("Đang dịch sang tiếng Việt...")
         frames.log_append(log_widget, "[Log] Đang dịch sang tiếng Việt...")
         save_config(api_key=api_key, model=model)
 
-        def worker():
-            try:
-                out = translate_wikitext(wikitext_en, api_key=api_key, model=model)
-                root.after(0, lambda w=out: on_translate_done(True, w))
-            except Exception as e:
-                err = str(e)
-                root.after(0, lambda e=err: on_translate_done(False, e))
+        def task():
+            return translate_wikitext(wikitext_en, api_key=api_key, model=model)
 
-        threading.Thread(target=worker, daemon=True).start()
+        run_background(root, task, on_translate_done)
+
+    # --- Thanh trạng thái (Phase 4)
+    _, status_var = frames.build_status_bar(root)
 
     # --- Link + nút Lấy wikitext + Dịch
     _, link_entry, fetch_btn, translate_btn = frames.build_link_frame(root, do_fetch, do_translate)

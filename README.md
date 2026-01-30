@@ -26,11 +26,12 @@ python src/main.py
 
 *(Nếu báo lỗi import, chạy từ thư mục gốc và dùng `python -m src.main`.)*
 
-## Cấu trúc (Phase 1–3)
+## Cấu trúc (Phase 1–4)
 
 - `src/main.py` — entry point, khởi chạy GUI
-- `src/gui/app.py` — cửa sổ chính (fetch + dịch chạy nền)
-- `src/gui/frames.py` — ô link, cấu hình (API key, model), nút Lấy wikitext / Dịch, ô log, wikitext EN/VI
+- `src/gui/app.py` — cửa sổ chính (fetch + dịch chạy nền qua `run_background`)
+- `src/gui/background.py` — **Phase 4:** `run_background(root, task_fn, on_done)` chạy tác vụ nền, callback trên main thread
+- `src/gui/frames.py` — ô link, cấu hình, thanh trạng thái (Sẵn sàng / Đang xử lý...), nút, ô log, wikitext EN/VI
 - `src/wikipedia/fetch.py` — parse URL → title, GET MediaWiki REST API → wikitext
 - `src/translate/gemini_client.py` — dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext)
 - `src/config_loader.py` — đọc/ghi `config/config.json` (API key, model)

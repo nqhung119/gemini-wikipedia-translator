@@ -1,6 +1,35 @@
-"""Hộp thoại: cài đặt API key, thông báo lỗi, tooltip (Phase 1–7)."""
+"""Hộp thoại: chọn ngôn ngữ, thông báo lỗi, tooltip (Phase 1–7)."""
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+
+
+def choose_language(parent):
+    """Hiển thị hộp thoại chọn ngôn ngữ (English / Tiếng Việt). Trả về 'en' hoặc 'vi'."""
+    result = [None]  # mutable để gán trong closure
+
+    dlg = tk.Toplevel(parent)
+    dlg.title("Chọn ngôn ngữ / Choose language")
+    dlg.resizable(False, False)
+    dlg.transient(parent)
+    dlg.grab_set()
+
+    f = ttk.Frame(dlg, padding=16)
+    f.pack(fill=tk.BOTH, expand=True)
+    ttk.Label(f, text="Select interface language:\nChọn ngôn ngữ giao diện:").pack(pady=(0, 12))
+    btn_frame = ttk.Frame(f)
+    btn_frame.pack()
+    ttk.Button(btn_frame, text="English", width=14, command=lambda: _set_and_close("en")).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Tiếng Việt", width=14, command=lambda: _set_and_close("vi")).pack(side=tk.LEFT, padx=4)
+
+    def _set_and_close(lang):
+        result[0] = lang
+        dlg.destroy()
+
+    dlg.protocol("WM_DELETE_WINDOW", lambda: _set_and_close("vi"))  # mặc định Việt nếu đóng
+    dlg.geometry("+%d+%d" % (parent.winfo_rootx() + 80, parent.winfo_rooty() + 80))
+    dlg.wait_window()
+    return result[0] if result[0] else "vi"
 
 
 def show_error(parent, title, message):

@@ -5,7 +5,8 @@ from tkinter import filedialog
 
 from src.gui import frames
 from src.gui.background import run_background
-from src.gui.dialogs import show_error, show_info, add_tooltip
+from src.gui.dialogs import show_error, show_info, add_tooltip, choose_language
+from src.gui.i18n import set_lang, t
 from src.wikipedia.fetch import fetch_wikitext_from_url
 from src.translate.gemini_client import translate_wikitext_chunked
 from src.config_loader import load_config, save_config
@@ -17,7 +18,11 @@ from src.check.normalize import normalize
 def run_app():
     """Khởi chạy ứng dụng GUI."""
     root = tk.Tk()
-    root.title("Dịch Wikipedia EN → VI")
+    root.withdraw()
+    lang = choose_language(root)
+    set_lang(lang)
+    root.deiconify()
+    root.title(t("app_title"))
     root.minsize(800, 600)
     root.geometry("900x800")
 
@@ -48,29 +53,29 @@ def run_app():
         if check_btn:
             check_btn.configure(state=state)
         if status_var:
-            status_var.set("Đang xử lý..." if busy else "Sẵn sàng")
+            status_var.set(t("status_busy") if busy else t("status_ready"))
 
     def on_fetch_done(success: bool, data: str):
         set_buttons_busy(False)
         if success:
             wikitext_en_widget.delete("1.0", tk.END)
             wikitext_en_widget.insert(tk.END, data)
-            frames.log_append(log_widget, "[Log] Đã lấy wikitext xong.")
+            frames.log_append(log_widget, t("log_fetched"))
         else:
-            frames.log_append(log_widget, f"[Log] Lỗi: {data}")
-            show_error(root, "Lỗi", data)
+            frames.log_append(log_widget, t("log_error", data=data))
+            show_error(root, t("dialog_error"), data)
 
     def do_fetch():
         url = link_entry.get().strip()
         if not url:
-            frames.log_append(log_widget, "[Log] Chưa nhập URL.")
+            frames.log_append(log_widget, t("log_no_url"))
             return
         if task_running:
             return
         set_buttons_busy(True)
         if status_var:
-            status_var.set("Đang lấy wikitext...")
-        frames.log_append(log_widget, "[Log] Đang lấy wikitext...")
+            status_var.set(t("status_fetching"))
+        frames.log_append(log_widget, t("log_fetching"))
 
         def task():
             return fetch_wikitext_from_url(url)
@@ -82,28 +87,28 @@ def run_app():
         if success:
             wikitext_vi_widget.delete("1.0", tk.END)
             wikitext_vi_widget.insert(tk.END, data)
-            frames.log_append(log_widget, "[Log] Đã dịch xong.")
+            frames.log_append(log_widget, t("log_translated"))
         else:
-            frames.log_append(log_widget, f"[Log] Lỗi dịch: {data}")
-            show_error(root, "Lỗi dịch", data)
+            frames.log_append(log_widget, t("log_translate_error", data=data))
+            show_error(root, t("dialog_translate_error"), data)
 
     def do_translate():
         wikitext_en = wikitext_en_widget.get("1.0", tk.END).strip()
         if not wikitext_en:
-            frames.log_append(log_widget, "[Log] Chưa có wikitext EN. Hãy bấm 'Lấy wikitext' trước.")
+            frames.log_append(log_widget, t("log_no_wikitext_en"))
             return
         api_key = api_key_entry.get().strip()
         model = (model_combo.get() or "gemini-1.5-flash").strip()
         if not api_key:
-            frames.log_append(log_widget, "[Log] Chưa nhập API key Gemini.")
-            show_error(root, "Cấu hình", "Vui lòng nhập API key Gemini trong ô Cấu hình Gemini.")
+            frames.log_append(log_widget, t("log_no_api_key"))
+            show_error(root, t("dialog_config"), t("config_enter_api_key"))
             return
         if task_running:
             return
         set_buttons_busy(True)
         if status_var:
-            status_var.set("Đang dịch sang tiếng Việt...")
-        frames.log_append(log_widget, "[Log] Đang dịch sang tiếng Việt...")
+            status_var.set(t("status_translating"))
+        frames.log_append(log_widget, t("log_translating"))
         save_config(api_key=api_key, model=model)
 
         def task():
@@ -116,39 +121,39 @@ def run_app():
         if last_normalized_wikitext is not None:
             wikitext_vi_widget.delete("1.0", tk.END)
             wikitext_vi_widget.insert(tk.END, last_normalized_wikitext)
-            frames.log_append(log_widget, "[Log] Đã áp dụng chuẩn hóa lên Wikitext VI.")
+            frames.log_append(log_widget, t("log_apply_normalize"))
 
     def do_copy():
         """Copy nội dung Wikitext VI vào clipboard (Phase 7)."""
         text = wikitext_vi_widget.get("1.0", tk.END)
         if not text.strip():
-            frames.log_append(log_widget, "[Log] Ô Wikitext VI trống.")
+            frames.log_append(log_widget, t("log_vi_empty"))
             return
         root.clipboard_clear()
         root.clipboard_append(text)
         root.update()
-        frames.log_append(log_widget, "[Log] Đã copy wikitext VI vào clipboard.")
+        frames.log_append(log_widget, t("log_copied"))
 
     def do_save():
         """Lưu Wikitext VI ra file .wiki hoặc .txt (Phase 7)."""
         text = wikitext_vi_widget.get("1.0", tk.END)
         if not text.strip():
-            frames.log_append(log_widget, "[Log] Ô Wikitext VI trống.")
+            frames.log_append(log_widget, t("log_vi_empty"))
             return
         path = filedialog.asksaveasfilename(
             defaultextension=".wiki",
             filetypes=[("Wikitext", "*.wiki"), ("Text", "*.txt"), ("All", "*.*")],
-            title="Lưu Wikitext VI",
+            title=t("save_wikitext_vi"),
         )
         if not path:
             return
         try:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(text)
-            frames.log_append(log_widget, f"[Log] Đã lưu vào: {path}")
+            frames.log_append(log_widget, t("log_saved", path=path))
         except Exception as e:
-            frames.log_append(log_widget, f"[Log] Lỗi lưu file: {e}")
-            show_error(root, "Lỗi", str(e))
+            frames.log_append(log_widget, t("log_save_error", e=str(e)))
+            show_error(root, t("dialog_error"), str(e))
 
     def on_check_done(success: bool, data):
         nonlocal last_normalized_wikitext
@@ -159,47 +164,44 @@ def run_app():
             frames.set_check_result(check_result_widget, lines)
             if apply_normalize_btn:
                 apply_normalize_btn.configure(state=tk.NORMAL if last_normalized_wikitext else tk.DISABLED)
-            frames.log_append(log_widget, "[Log] Đã chạy kiểm tra (bố cục + nội dung + chuẩn hóa).")
+            frames.log_append(log_widget, t("log_check_done"))
         else:
             last_normalized_wikitext = None
             if apply_normalize_btn:
                 apply_normalize_btn.configure(state=tk.DISABLED)
-            frames.set_check_result(check_result_widget, [f"Lỗi: {data}"])
-            frames.log_append(log_widget, f"[Log] Lỗi kiểm tra: {data}")
+            frames.set_check_result(check_result_widget, [t("dialog_error") + ": " + str(data)])
+            frames.log_append(log_widget, t("log_check_error", data=str(data)))
 
     def do_check():
         wikitext_vi = wikitext_vi_widget.get("1.0", tk.END).strip()
         wikitext_en = wikitext_en_widget.get("1.0", tk.END).strip()
         wikitext = wikitext_vi or wikitext_en
         if not wikitext:
-            frames.log_append(log_widget, "[Log] Chưa có wikitext (EN hoặc VI). Hãy Lấy wikitext hoặc Dịch trước.")
-            frames.set_check_result(check_result_widget, ["Chưa có wikitext để kiểm tra."])
+            frames.log_append(log_widget, t("log_no_wikitext"))
+            frames.set_check_result(check_result_widget, [t("no_wikitext_to_check")])
             return
         if task_running:
             return
         set_buttons_busy(True)
         if status_var:
-            status_var.set("Đang kiểm tra & chuẩn hóa...")
-        frames.log_append(log_widget, "[Log] Đang kiểm tra & chuẩn hóa...")
+            status_var.set(t("status_checking"))
+        frames.log_append(log_widget, t("log_checking"))
 
         def task():
             lines = []
             normalized_wikitext = None
-            # Phase 5: bố cục
             layout_warnings = check_layout(wikitext_vi or wikitext_en)
-            lines.append("--- Bố cục ---")
+            lines.append(t("check_section_layout"))
             lines.extend(layout_warnings)
-            # Phase 6: nội dung (EN vs VI)
             if wikitext_en and wikitext_vi:
                 content_warnings = check_content(wikitext_en, wikitext_vi)
                 lines.append("")
-                lines.append("--- Nội dung (EN vs VI) ---")
+                lines.append(t("check_section_content"))
                 lines.extend(content_warnings)
-            # Phase 6: chuẩn hóa (thuật ngữ, link)
             if wikitext_vi:
                 normalized_wikitext, normalize_report = normalize(wikitext_vi)
                 lines.append("")
-                lines.append("--- Chuẩn hóa ---")
+                lines.append(t("check_section_normalize"))
                 lines.extend(normalize_report)
             return {"lines": lines, "normalized_wikitext": normalized_wikitext}
 
@@ -209,22 +211,15 @@ def run_app():
     menubar = tk.Menu(root)
     root.config(menu=menubar)
     file_menu = tk.Menu(menubar, tearoff=0)
-    menubar.add_cascade(label="File", menu=file_menu)
-    file_menu.add_command(label="Lưu Wikitext VI...", command=do_save)
+    menubar.add_cascade(label=t("menu_file"), menu=file_menu)
+    file_menu.add_command(label=t("menu_save_wikitext"), command=do_save)
     file_menu.add_separator()
-    file_menu.add_command(label="Thoát", command=root.quit)
+    file_menu.add_command(label=t("menu_exit"), command=root.quit)
     help_menu = tk.Menu(menubar, tearoff=0)
-    menubar.add_cascade(label="Help", menu=help_menu)
+    menubar.add_cascade(label=t("menu_help"), menu=help_menu)
     help_menu.add_command(
-        label="Giới thiệu",
-        command=lambda: show_info(
-            root,
-            "Giới thiệu",
-            "Dịch Wikipedia EN → VI\n\n"
-            "Lấy bài Wikipedia tiếng Anh, dịch sang tiếng Việt qua Gemini API,\n"
-            "kiểm tra bố cục, chuẩn hóa thuật ngữ, xuất mã nguồn wikitext.\n\n"
-            "Xem docs/ke-hoach.md và docs/nghien-cuu.md.",
-        ),
+        label=t("menu_about"),
+        command=lambda: show_info(root, t("dialog_about"), t("about_text")),
     )
 
     # --- Vùng cuộn: Canvas + Scrollbar chứa toàn bộ nội dung chính
@@ -262,9 +257,9 @@ def run_app():
     _, link_entry, fetch_btn, translate_btn, check_btn = frames.build_link_frame(
         content_frame, do_fetch, do_translate, do_check
     )
-    add_tooltip(fetch_btn, "Lấy mã nguồn wikitext từ link Wikipedia tiếng Anh.")
-    add_tooltip(translate_btn, "Dịch wikitext EN → VI qua Gemini API (giữ cú pháp wikitext).")
-    add_tooltip(check_btn, "Kiểm tra bố cục, so sánh EN/VI, chuẩn hóa thuật ngữ.")
+    add_tooltip(fetch_btn, t("tooltip_fetch"))
+    add_tooltip(translate_btn, t("tooltip_translate"))
+    add_tooltip(check_btn, t("tooltip_check"))
     link_entry.insert(0, "https://en.wikipedia.org/wiki/Front-side_bus")
 
     # --- Cấu hình Gemini
@@ -280,7 +275,7 @@ def run_app():
 
     # --- Log
     _, log_widget = frames.build_log_frame(content_frame)
-    frames.log_append(log_widget, "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch / Kiểm tra.")
+    frames.log_append(log_widget, t("log_startup"))
 
     # --- Wikitext EN
     _, wikitext_en_widget = frames.build_wikitext_en_frame(content_frame)
@@ -290,8 +285,8 @@ def run_app():
 
     # --- Xuất Wikitext VI: Copy, Lưu file (Phase 7)
     _, copy_btn, save_btn = frames.build_export_frame(content_frame, do_copy, do_save)
-    add_tooltip(copy_btn, "Copy toàn bộ nội dung ô Wikitext VI vào clipboard.")
-    add_tooltip(save_btn, "Lưu Wikitext VI ra file .wiki hoặc .txt.")
+    add_tooltip(copy_btn, t("tooltip_copy"))
+    add_tooltip(save_btn, t("tooltip_save"))
 
     # --- Kết quả kiểm tra + nút Áp dụng chuẩn hóa (Phase 5–6)
     _, check_result_widget, apply_normalize_btn = frames.build_check_result_frame(content_frame, do_apply_normalize)

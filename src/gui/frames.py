@@ -12,14 +12,15 @@ def build_link_frame(parent, on_fetch_click, on_translate_click=None, on_check_c
     ttk.Label(frame, text=t("url_label")).pack(side=tk.LEFT, padx=(0, 4))
     entry = ttk.Entry(frame, width=70)
     entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 8))
-    btn_fetch = ttk.Button(frame, text=t("btn_fetch"), command=on_fetch_click)
-    btn_fetch.pack(side=tk.RIGHT, padx=(0, 4))
-    if on_translate_click:
-        btn_translate = ttk.Button(frame, text=t("btn_translate"), command=on_translate_click)
-        btn_translate.pack(side=tk.RIGHT, padx=(0, 4))
+    # Thứ tự nút: Lấy wikitext → Dịch → Kiểm tra (pack RIGHT nên pack ngược lại)
     if on_check_click:
         btn_check = ttk.Button(frame, text=t("btn_check"), command=on_check_click)
         btn_check.pack(side=tk.RIGHT)
+    if on_translate_click:
+        btn_translate = ttk.Button(frame, text=t("btn_translate"), command=on_translate_click)
+        btn_translate.pack(side=tk.RIGHT, padx=(0, 4))
+    btn_fetch = ttk.Button(frame, text=t("btn_fetch"), command=on_fetch_click)
+    btn_fetch.pack(side=tk.RIGHT, padx=(0, 4))
     frame.pack(fill=tk.X, padx=8, pady=6)
     if on_translate_click and on_check_click:
         return frame, entry, btn_fetch, btn_translate, btn_check
@@ -39,19 +40,13 @@ def build_config_frame(parent):
         frame,
         width=26,
         values=[
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
-            "gemini-2.0-flash",
-            "gemini-2.5-flash",
-            "gemini-2.5-flash-lite",
-            "gemini-2.5-pro",
             "gemini-3-flash-preview",
             "gemini-3-pro-preview",
         ],
         state="readonly",
     )
     model_combo.pack(side=tk.LEFT, padx=(0, 8))
-    model_combo.set("gemini-1.5-flash")
+    model_combo.set("gemini-3-flash-preview")
     frame.pack(fill=tk.X, padx=8, pady=6)
     return frame, api_key_entry, model_combo
 

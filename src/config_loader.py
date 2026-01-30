@@ -4,7 +4,7 @@
 import json
 from pathlib import Path
 
-CONFIG_DEFAULT = {"api_key": "", "model": "gemini-1.5-flash"}
+CONFIG_DEFAULT = {"api_key": "", "model": "gemini-3-flash-preview"}
 
 
 def _config_path():

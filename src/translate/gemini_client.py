@@ -33,7 +33,7 @@ def translate_wikitext(
     wikitext_en: str,
     *,
     api_key: str,
-    model: str = "gemini-1.5-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> str:
     """
     Dịch wikitext tiếng Anh sang tiếng Việt qua Gemini API.
@@ -64,7 +64,7 @@ def translate_wikitext_chunked(
     wikitext_en: str,
     *,
     api_key: str,
-    model: str = "gemini-1.5-flash",
+    model: str = "gemini-3-flash-preview",
     max_chars: int = CHUNK_MAX_CHARS,
     threshold: int = CHUNK_THRESHOLD,
 ) -> str:

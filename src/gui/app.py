@@ -17,11 +17,9 @@ from src.check.normalize import normalize
 
 def run_app():
     """Khởi chạy ứng dụng GUI."""
-    root = tk.Tk()
-    root.withdraw()
-    lang = choose_language(root)
+    lang = choose_language()
     set_lang(lang)
-    root.deiconify()
+    root = tk.Tk()
     root.title(t("app_title"))
     root.minsize(800, 600)
     root.geometry("900x800")
@@ -98,7 +96,7 @@ def run_app():
             frames.log_append(log_widget, t("log_no_wikitext_en"))
             return
         api_key = api_key_entry.get().strip()
-        model = (model_combo.get() or "gemini-1.5-flash").strip()
+        model = (model_combo.get() or "gemini-3-flash-preview").strip()
         if not api_key:
             frames.log_append(log_widget, t("log_no_api_key"))
             show_error(root, t("dialog_config"), t("config_enter_api_key"))

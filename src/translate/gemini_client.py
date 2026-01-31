@@ -7,9 +7,10 @@ import google.generativeai as genai
 from src.translate.chunker import chunk_wikitext
 
 # Ngưỡng (ký tự): nếu wikitext dài hơn thì dùng chunker dịch từng phần (Phase 8).
-CHUNK_THRESHOLD = 35000
-# Kích thước tối đa mỗi chunk khi chia (để tránh vượt context Gemini).
-CHUNK_MAX_CHARS = 45000
+# Context Gemini rất lớn (200k–1M token ≈ 800k–4M ký tự); đặt cao để ít chunk, ít gọi API.
+CHUNK_THRESHOLD = 400_000
+# Kích thước tối đa mỗi chunk (an toàn cho context ~200k token, còn chỗ cho prompt + output).
+CHUNK_MAX_CHARS = 400_000
 
 
 def _build_translate_prompt_prefix(source_lang_name: str, target_lang_name: str) -> str:

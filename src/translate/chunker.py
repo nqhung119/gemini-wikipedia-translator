@@ -8,7 +8,7 @@ import re
 def chunk_wikitext(
     wikitext: str,
     *,
-    max_chars: int = 50000,
+    max_chars: int = 400_000,
 ) -> list[str]:
     """
     Tách wikitext thành danh sách block (list[str]) theo section và/hoặc max_chars.
@@ -47,13 +47,29 @@ def chunk_wikitext(
         if intro:
             parts.insert(0, intro)
 
-    # Nếu phần nào dài hơn max_chars thì cắt nhỏ theo max_chars
+    # Gộp các section liên tiếp thành chunk cho đến khi gần đạt max_chars (tránh quá nhiều chunk).
+    # Nếu một phần đơn lẻ dài hơn max_chars thì cắt theo max_chars.
     result: list[str] = []
+    current: list[str] = []
+    current_len = 0
     for part in parts:
-        if len(part) <= max_chars:
-            result.append(part)
-        else:
+        if len(part) > max_chars:
+            if current:
+                result.append("\n\n".join(current))
+                current = []
+                current_len = 0
             result.extend(_split_by_size(part, max_chars))
+        else:
+            need = len(part) + (2 if current else 0)  # \n\n giữa các phần
+            if current_len + need > max_chars and current:
+                result.append("\n\n".join(current))
+                current = [part]
+                current_len = len(part)
+            else:
+                current.append(part)
+                current_len += need
+    if current:
+        result.append("\n\n".join(current))
     return result
 
 

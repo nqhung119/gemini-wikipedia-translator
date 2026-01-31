@@ -44,7 +44,7 @@ STRINGS = {
         "no_wikitext_to_check": "No wikitext to check.",
         # Menu
         "menu_file": "File",
-        "menu_save_wikitext": "Save Wikitext VI...",
+        "menu_save_wikitext": "Save target wikitext...",
         "menu_exit": "Exit",
         "menu_help": "Help",
         "menu_intro": "Introduction",
@@ -157,7 +157,7 @@ STRINGS = {
         "no_wikitext_to_check": "Chưa có wikitext để kiểm tra.",
         # Menu
         "menu_file": "File",
-        "menu_save_wikitext": "Lưu Wikitext VI...",
+        "menu_save_wikitext": "Lưu wikitext đích...",
         "menu_exit": "Thoát",
         "menu_help": "Help",
         "menu_intro": "Giới thiệu",

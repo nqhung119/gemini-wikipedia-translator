@@ -32,6 +32,35 @@ Wikitext cần dịch:
 """
 
 
+def _get_response_text(response) -> str:
+    """
+    Lấy chuỗi text từ response Gemini. Hỗ trợ cả response.text (1.5) và
+    response.candidates[0].content.parts (Gemini 3 / response không đơn phần).
+    """
+    try:
+        if response.text:
+            return response.text.strip()
+    except (ValueError, TypeError, AttributeError):
+        pass
+    # Fallback: lấy từ candidates[0].content.parts (chuẩn với Gemini 3)
+    if not getattr(response, "candidates", None) or len(response.candidates) == 0:
+        raise ValueError("Gemini không trả về candidate (có thể bị chặn hoặc lỗi API).")
+    candidate = response.candidates[0]
+    if not getattr(candidate, "content", None) or not getattr(candidate.content, "parts", None):
+        reason = getattr(candidate, "finish_reason", None) or "unknown"
+        raise ValueError(f"Gemini không trả về nội dung (finish_reason: {reason}).")
+    parts = candidate.content.parts
+    if not parts:
+        raise ValueError("Gemini trả về parts rỗng.")
+    texts = []
+    for part in parts:
+        if hasattr(part, "text") and part.text:
+            texts.append(part.text)
+    if not texts:
+        raise ValueError("Gemini không trả về text trong parts.")
+    return "".join(texts).strip()
+
+
 def translate_wikitext(
     wikitext_source: str,
     *,
@@ -64,9 +93,7 @@ def translate_wikitext(
         response = gemini_model.generate_content(prompt, generation_config=config)
     except (AttributeError, TypeError):
         response = gemini_model.generate_content(prompt)
-    if not response.text:
-        raise ValueError("Gemini không trả về nội dung.")
-    return response.text.strip()
+    return _get_response_text(response)
 
 
 def translate_wikitext_chunked(

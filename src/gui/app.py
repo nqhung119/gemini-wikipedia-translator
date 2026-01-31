@@ -10,9 +10,7 @@ from src.gui.i18n import set_lang, t
 from src.wikipedia.fetch import fetch_wikitext_from_url
 from src.translate.gemini_client import translate_wikitext_chunked
 from src.config_loader import load_config, save_config
-from src.check.layout import check_layout
-from src.check.content import check_content
-from src.check.normalize import normalize
+from src.check.ai_check import check_with_ai
 from src.languages import LANGUAGES, get_lang_code_from_name
 
 
@@ -221,30 +219,37 @@ def run_app():
             frames.log_append(log_widget, t("log_no_wikitext"))
             frames.set_check_result(check_result_widget, [t("no_wikitext_to_check")])
             return
+        api_key = api_key_entry.get().strip()
+        if api_key == t("api_key_placeholder"):
+            api_key = ""
+        if not api_key:
+            frames.log_append(log_widget, t("log_check_need_api_key"))
+            show_error(root, t("dialog_config"), t("config_check_need_api_key"))
+            return
         if task_running:
             return
+        model = (model_combo.get() or "gemini-3-flash-preview").strip()
+        source_name = source_lang_combo.get().strip() if source_lang_combo else "English"
+        target_name = target_lang_combo.get().strip() if target_lang_combo else "Vietnamese"
         set_buttons_busy(True)
         if status_var:
             status_var.set(t("status_checking"))
         frames.log_append(log_widget, t("log_checking"))
 
         def task():
-            lines = []
-            normalized_wikitext = None
-            layout_warnings = check_layout(wikitext_vi or wikitext_en)
-            lines.append(t("check_section_layout"))
-            lines.extend(layout_warnings)
-            if wikitext_en and wikitext_vi:
-                content_warnings = check_content(wikitext_en, wikitext_vi)
-                lines.append("")
-                lines.append(t("check_section_content"))
-                lines.extend(content_warnings)
-            if wikitext_vi:
-                normalized_wikitext, normalize_report = normalize(wikitext_vi)
-                lines.append("")
-                lines.append(t("check_section_normalize"))
-                lines.extend(normalize_report)
-            return {"lines": lines, "normalized_wikitext": normalized_wikitext}
+            wikitext_target = wikitext_vi if wikitext_vi else wikitext_en
+            wikitext_source = wikitext_en if (wikitext_en and wikitext_vi) else None
+            # Khi chỉ có một ô có nội dung, coi ngôn ngữ đích = nguồn để nhãn báo cáo đúng
+            tgt_name = target_name if wikitext_vi else source_name
+            lines = check_with_ai(
+                wikitext_target,
+                api_key=api_key,
+                model=model,
+                source_lang_name=source_name,
+                target_lang_name=tgt_name,
+                wikitext_source=wikitext_source,
+            )
+            return {"lines": lines, "normalized_wikitext": None}
 
         run_background(root, task, on_check_done)
 

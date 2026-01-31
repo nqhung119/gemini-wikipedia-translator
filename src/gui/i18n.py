@@ -60,6 +60,7 @@ STRINGS = {
         "dialog_intro": "Introduction",
         "dialog_guide": "User guide",
         "config_enter_api_key": "Please enter Gemini API key in the Gemini configuration section.",
+        "config_check_need_api_key": "Check uses AI (Gemini). Please enter Gemini API key to run check.",
         "save_wikitext_vi": "Save target wikitext",
         # Introduction
         "intro_text": (
@@ -96,15 +97,16 @@ STRINGS = {
         "log_copied": "[Log] Target wikitext copied to clipboard.",
         "log_saved": "[Log] Saved to: {path}",
         "log_save_error": "[Log] Save error: {e}",
-        "log_check_done": "[Log] Check (layout + content + normalize) done.",
+        "log_check_done": "[Log] AI check done.",
         "log_check_error": "[Log] Check error: {data}",
+        "log_check_need_api_key": "[Log] API key required for AI check.",
         "log_no_wikitext": "[Log] No wikitext. Fetch or translate first.",
-        "log_checking": "[Log] Checking & normalizing...",
+        "log_checking": "[Log] Running AI check (Gemini)...",
         "log_startup": "[Log] App started. Enter link, API key (if needed), then Fetch / Translate / Check.",
         # Tooltips
         "tooltip_fetch": "Fetch wikitext from the Wikipedia URL (any language).",
         "tooltip_translate": "Translate wikitext from source to target language via Gemini API.",
-        "tooltip_check": "Check layout, compare source/target, normalize terminology.",
+        "tooltip_check": "Run AI check (layout, content, terminology, links) via Gemini.",
         "tooltip_copy": "Copy entire target wikitext to clipboard.",
         "tooltip_save": "Save target wikitext to .wiki or .txt file.",
         # Check task labels (in do_check)
@@ -171,6 +173,7 @@ STRINGS = {
         "dialog_intro": "Giới thiệu",
         "dialog_guide": "Hướng dẫn dùng",
         "config_enter_api_key": "Vui lòng nhập API key Gemini trong ô Cấu hình Gemini.",
+        "config_check_need_api_key": "Kiểm tra dùng AI (Gemini). Vui lòng nhập API key Gemini để chạy kiểm tra.",
         "save_wikitext_vi": "Lưu wikitext đích",
         # Giới thiệu
         "intro_text": (
@@ -207,15 +210,16 @@ STRINGS = {
         "log_copied": "[Log] Đã copy wikitext đích vào clipboard.",
         "log_saved": "[Log] Đã lưu vào: {path}",
         "log_save_error": "[Log] Lỗi lưu file: {e}",
-        "log_check_done": "[Log] Đã chạy kiểm tra (bố cục + nội dung + chuẩn hóa).",
+        "log_check_done": "[Log] Đã chạy kiểm tra bằng AI xong.",
         "log_check_error": "[Log] Lỗi kiểm tra: {data}",
+        "log_check_need_api_key": "[Log] Cần API key để chạy kiểm tra bằng AI.",
         "log_no_wikitext": "[Log] Chưa có wikitext. Hãy Lấy wikitext hoặc Dịch trước.",
-        "log_checking": "[Log] Đang kiểm tra & chuẩn hóa...",
+        "log_checking": "[Log] Đang chạy kiểm tra bằng AI (Gemini)...",
         "log_startup": "[Log] Ứng dụng đã khởi động. Nhập link, API key (nếu cần), rồi Lấy wikitext / Dịch / Kiểm tra.",
         # Tooltips
         "tooltip_fetch": "Lấy wikitext từ link Wikipedia (mọi ngôn ngữ).",
         "tooltip_translate": "Dịch wikitext từ ngôn ngữ nguồn sang đích qua Gemini API.",
-        "tooltip_check": "Kiểm tra bố cục, so sánh nguồn/đích, chuẩn hóa thuật ngữ.",
+        "tooltip_check": "Chạy kiểm tra bằng AI (bố cục, nội dung, thuật ngữ, link) qua Gemini.",
         "tooltip_copy": "Copy toàn bộ wikitext đích vào clipboard.",
         "tooltip_save": "Lưu wikitext đích ra file .wiki hoặc .txt.",
         # Check task labels

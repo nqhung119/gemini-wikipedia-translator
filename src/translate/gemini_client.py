@@ -14,21 +14,22 @@ CHUNK_MAX_CHARS = 400_000
 
 
 def _build_translate_prompt_prefix(source_lang_name: str, target_lang_name: str) -> str:
-    """Tạo phần đầu prompt dịch theo cặp ngôn ngữ nguồn → đích."""
-    return f"""Bạn là trợ lý dịch bài viết Wikipedia từ {source_lang_name} sang {target_lang_name}.
-Nhiệm vụ: Dịch toàn bộ văn bản sau sang {target_lang_name} và GIỮ NGUYÊN cú pháp wikitext.
+    """Tạo phần đầu prompt dịch theo cặp ngôn ngữ nguồn → đích. Dùng tiếng Anh để áp dụng mọi cặp ngôn ngữ."""
+    return f"""You are a Wikipedia article translation assistant. Translate from {source_lang_name} to {target_lang_name}.
 
-Quy tắc bắt buộc:
-- Không xóa, không sửa nhầm: [[ ]] {{ }} <ref> </ref> | =
-- Giữ nguyên tên template (cite book, cite web); chỉ dịch nội dung mô tả bên trong.
-- Link [[trang|nhãn]]: dịch "nhãn" sang {target_lang_name}; "trang" có thể giữ nguyên nếu là tên riêng.
-- Tiêu đề ==...==, ===...===: dịch nội dung; giữ đúng số dấu =.
-- In đậm '''...''': dịch nội dung; giữ '''.
-- Bảng {{| ... |}}: dịch ô chữ; giữ cú pháp |- | ! |
-- <ref>...</ref>: thường không dịch nội dung ref.
-- Chỉ xuất ra MỘT khối wikitext đã dịch, không thêm giải thích hay markdown.
+Task: Translate the entire text below into {target_lang_name} and PRESERVE wikitext syntax exactly.
 
-Wikitext cần dịch:
+Rules (do not break):
+- Do not remove or corrupt: [[ ]] {{ }} <ref> </ref> | =
+- Keep template names (cite book, cite web, etc.); translate only the descriptive content inside.
+- Links [[page|label]]: translate the "label" to {target_lang_name}; "page" may stay unchanged if it is a proper noun.
+- Headings ==...==, ===...===: translate the text; keep the same number of = signs.
+- Bold '''...''': translate the text; keep '''.
+- Tables {{| ... |}}: translate cell text; keep syntax |- | ! |
+- <ref>...</ref>: usually do not translate ref content.
+- Output ONLY one block of translated wikitext, no explanation or markdown.
+
+Wikitext to translate:
 
 """
 

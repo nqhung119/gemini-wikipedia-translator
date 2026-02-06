@@ -53,8 +53,9 @@ STRINGS = {
         "dialog_error": "Error",
         "dialog_translate_error": "Translation error",
         "error_429_hint": (
-            "Hint: Free tier quota is per model. "
-            "Try selecting 'gemini-3-flash-preview' instead of 'gemini-3-pro-preview', or retry in a minute."
+            "Hint: gemini-3-pro-preview does NOT have a free tier in the API (only free in AI Studio web). "
+            "Please use 'gemini-3-flash-preview' (has free tier) or set up billing for Pro. "
+            "If using Flash and still seeing this error, wait a minute and retry."
         ),
         "dialog_config": "Configuration",
         "dialog_intro": "Introduction",
@@ -77,9 +78,11 @@ STRINGS = {
             "2. URL: Paste a Wikipedia article link (any language, e.g. https://en.wikipedia.org/wiki/...).\n\n"
             "3. Fetch wikitext: Click to download the article source (wikitext).\n\n"
             "4. API key: Enter your Gemini API key in the configuration section (saved in config/config.json).\n\n"
-            "5. Translate: Click to translate the source wikitext to the target language.\n\n"
-            "6. Check & Normalize: Check layout (links, templates, refs), compare source/target, normalize terms. Optionally apply normalization to the target box.\n\n"
-            "7. Export: Copy target wikitext to clipboard or save to .wiki / .txt file (File → Save)."
+            "5. Model: Choose Gemini model. NOTE: gemini-3-pro-preview requires billing (no free tier). "
+            "Use gemini-3-flash-preview for free tier.\n\n"
+            "6. Translate: Click to translate the source wikitext to the target language.\n\n"
+            "7. Check & Normalize: Check layout (links, templates, refs), compare source/target, normalize terms. Optionally apply normalization to the target box.\n\n"
+            "8. Export: Copy target wikitext to clipboard or save to .wiki / .txt file (File → Save)."
         ),
         # Log messages
         "log_fetched": "[Log] Wikitext fetched.",
@@ -166,8 +169,9 @@ STRINGS = {
         "dialog_error": "Lỗi",
         "dialog_translate_error": "Lỗi dịch",
         "error_429_hint": (
-            "Gợi ý: Hạn mức (quota) free tier tính theo từng model. "
-            "Thử chọn model 'gemini-3-flash-preview' thay vì 'gemini-3-pro-preview', hoặc thử lại sau vài chục giây."
+            "Gợi ý: gemini-3-pro-preview KHÔNG có free tier trong API (chỉ miễn phí trên web AI Studio). "
+            "Vui lòng dùng 'gemini-3-flash-preview' (có free tier) hoặc thiết lập billing cho Pro. "
+            "Nếu đang dùng Flash và vẫn báo lỗi, hãy đợi 1 phút rồi thử lại."
         ),
         "dialog_config": "Cấu hình",
         "dialog_intro": "Giới thiệu",
@@ -182,6 +186,19 @@ STRINGS = {
             "Chọn ngôn ngữ nguồn và đích (mặc định: Tiếng Anh → Tiếng Việt), "
             "dán link bài Wikipedia, lấy wikitext, dịch qua Gemini API, "
             "sau đó kiểm tra bố cục, chuẩn hóa thuật ngữ và xuất kết quả."
+        ),
+        # Hướng dẫn dùng
+        "guide_text": (
+            "Hướng dẫn sử dụng:\n\n"
+            "1. Từ / Sang: Chọn ngôn ngữ nguồn và đích (ví dụ: English → Tiếng Việt).\n\n"
+            "2. URL: Dán link bài viết Wikipedia (bất kỳ ngôn ngữ, ví dụ: https://en.wikipedia.org/wiki/...).\n\n"
+            "3. Lấy wikitext: Click để tải mã nguồn wikitext của bài viết.\n\n"
+            "4. API key: Nhập API key Gemini vào phần Cấu hình (được lưu trong config/config.json).\n\n"
+            "5. Model: Chọn model Gemini. LƯU Ý: gemini-3-pro-preview CẦN billing (không có free tier). "
+            "Hãy dùng gemini-3-flash-preview để dùng miễn phí.\n\n"
+            "6. Dịch: Click để dịch wikitext nguồn sang ngôn ngữ đích.\n\n"
+            "7. Kiểm tra & Chuẩn hóa: Kiểm tra layout (link, template, ref), so sánh nguồn/đích, chuẩn hóa thuật ngữ. Có thể áp dụng chuẩn hóa lên ô đích.\n\n"
+            "8. Xuất: Copy wikitext đích ra clipboard hoặc lưu ra file .wiki / .txt (File → Lưu)."
         ),
         # Hướng dẫn dùng
         "guide_text": (

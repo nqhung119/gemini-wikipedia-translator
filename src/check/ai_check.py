@@ -80,8 +80,13 @@ def check_with_ai(
     prompt = _build_check_prompt(wt_source, wt_target, source_name, target_name)
     genai.configure(api_key=api_key)
     gemini_model = genai.GenerativeModel(model)
+    
+    # Gemini 3 yêu cầu temperature=1.0 (mặc định), Gemini 2.x thì 0.2 tốt hơn
+    is_gemini_3 = "gemini-3" in model.lower()
+    temp = 1.0 if is_gemini_3 else 0.2
+    
     try:
-        config = genai.types.GenerationConfig(temperature=0.2)
+        config = genai.types.GenerationConfig(temperature=temp)
         response = gemini_model.generate_content(prompt, generation_config=config)
     except (AttributeError, TypeError):
         response = gemini_model.generate_content(prompt)
